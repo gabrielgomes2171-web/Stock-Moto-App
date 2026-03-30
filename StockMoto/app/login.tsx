@@ -1,5 +1,6 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { AntDesign } from "@expo/vector-icons"
+import PrimaryButton from '../components/PrimaryButton';
 
 export default function Login() {
   return (
@@ -31,9 +32,10 @@ export default function Login() {
         style={styles.input}
       />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>ENTRAR NA CONTA</Text>
-      </TouchableOpacity>
+      <PrimaryButton
+        title='ENTRAR NA CONTA'
+        onPress={() => alert('Funcionando!')}
+      />
 
       <View style={styles.footer}>
         <Text style={styles.link}>Esqueceu a senha?</Text>
