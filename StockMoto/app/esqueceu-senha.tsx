@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView
-} from 'react-native';
+import {View,Text,TextInput,TouchableOpacity,StyleSheet,SafeAreaView, Image} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
+  const router = useRouter();
 
   const handleSend = () => {
     console.log('Enviar instruções para:', email);
@@ -20,12 +15,10 @@ export default function ForgotPasswordScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
 
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Ionicons name="bicycle" size={80} color="#FF7A00" />
-          <Text style={styles.logoText}>STOCK</Text>
-          <Text style={styles.subLogo}>MOTO PEÇAS</Text>
-        </View>
+        <Image
+        source={require('../assets/images/logo.png')} 
+        style={styles.logo}
+        />
 
         {/* Title */}
         <Text style={styles.title}>Esqueceu a senha?</Text>
@@ -52,9 +45,9 @@ export default function ForgotPasswordScreen() {
 
         {/* Footer Links */}
         <View style={styles.footer}>
-          <TouchableOpacity>
-            <Text style={styles.link}>Voltar para o Login</Text>
-          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.link}>Voltar para o Login</Text>
+        </TouchableOpacity>
 
           <TouchableOpacity>
             <Text style={styles.link}>Cadastre-se aqui</Text>
@@ -69,16 +62,22 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D0D0D'
+    backgroundColor: '#101010'
   },
   content: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  logo: {
+  width: 450,
+  height: 200,
+  marginBottom: 20,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40
+    marginBottom: 50
   },
   logoText: {
     color: '#FFF',
@@ -110,6 +109,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E5E5',
     borderRadius: 8,
     paddingHorizontal: 10,
+    width: '100%',
     marginBottom: 20
   },
   input: {
@@ -119,11 +119,12 @@ const styles = StyleSheet.create({
     color: '#000'
   },
   button: {
-    backgroundColor: '#FF7A00',
-    paddingVertical: 14,
-    borderRadius: 8,
+    backgroundColor: '#f4882f',
+    padding: 14,
+    borderRadius: 10,
+    width: '100%',
     alignItems: 'center',
-    marginBottom: 20
+    marginTop: 10,
   },
   buttonText: {
     color: '#FFF',
@@ -131,10 +132,12 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 15,
   },
   link: {
     color: '#4DA6FF',
     fontSize: 12
-  }
+  },
 });

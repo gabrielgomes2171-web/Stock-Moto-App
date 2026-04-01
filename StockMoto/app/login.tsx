@@ -1,5 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { AntDesign } from "@expo/vector-icons"
+import { Ionicons } from '@expo/vector-icons';
 import PrimaryButton from '../components/PrimaryButton';
 import { useRouter } from 'expo-router';
 
@@ -37,7 +38,7 @@ export default function Login() {
 
       <PrimaryButton
         title='ENTRAR NA CONTA'
-        onPress={() => alert('Funcionando!')}
+        onPress={() => alert('Bem Vindo!')}
       />
 
       <View style={styles.footer}>
