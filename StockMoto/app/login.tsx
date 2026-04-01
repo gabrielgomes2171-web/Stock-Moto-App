@@ -1,8 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { AntDesign } from "@expo/vector-icons"
 import PrimaryButton from '../components/PrimaryButton';
+import { useRouter } from 'expo-router';
+
 
 export default function Login() {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       
@@ -38,8 +41,10 @@ export default function Login() {
       />
 
       <View style={styles.footer}>
+        <TouchableOpacity onPress={() => router.push('/esqueceu-senha')}>
         <Text style={styles.link}>Esqueceu a senha?</Text>
-        <Text style={styles.link}>Cadastre-se aqui</Text>
+        </TouchableOpacity>
+          <Text style={styles.link}>Cadastre-se aqui</Text>
       </View>
 
     </View>
