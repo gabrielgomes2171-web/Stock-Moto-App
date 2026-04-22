@@ -38,7 +38,10 @@ export default function Login() {
 
       <PrimaryButton
         title='ENTRAR NA CONTA'
-        onPress={() => alert('Bem Vindo!')}
+        onPress={() => {
+          Alert.alert('Bem Vindo Novamente!');
+          router.replace('/inicial');
+        }}
       />
 
       <View style={styles.footer}>
