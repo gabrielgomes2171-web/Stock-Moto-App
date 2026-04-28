@@ -1,10 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRef, useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
 
 export default function VerificarEmail() {
 
   const [code, setCode] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(60);
+  const router = useRouter();
 
   const inputs = [
     useRef<TextInput>(null),
@@ -78,7 +80,9 @@ export default function VerificarEmail() {
         ))}
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button}
+      onPress={() => router.push('/redefinir-senha')}
+      >
         <Text style={styles.buttonText}>VERIFICAR CÓDIGO</Text>
       </TouchableOpacity>
 

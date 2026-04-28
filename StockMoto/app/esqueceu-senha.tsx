@@ -31,17 +31,17 @@ export default function ForgotPasswordScreen() {
           <TextInput
             style={styles.input}
             placeholder="Seu e-mail"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}
           />
         </View>
 
-        <TouchableOpacity style={styles.button} 
-        onPress={() => router.push('/verificar-email')}
-        >
+        <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.push('/verificar-email')}>
           <Text style={styles.buttonText}>ENVIAR INSTRUÇÕES</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => router.back()}>
