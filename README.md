@@ -1,165 +1,149 @@
-# Stock-Moto-App
-📱 Tela de Login - React Native (Expo)
+# 🏍️ Stock Moto
 
-📌 Descrição Geral
+<p align="center">
+  <img src="./assets/telalogin.png" width="250"/>
+  <img src="./assets/telainicial.png" width="250"/>
+  <img src="./assets/telaestoque.png" width="250"/>
+</p>
 
-A tela de login permite que o usuário acesse o aplicativo por meio de autenticação.  
-Ela oferece duas opções principais:
-
-- Login tradicional (usuário e senha)
-- Login com conta Google (interface visual com ícone)
-
-A interface foi desenvolvida com foco em simplicidade, usabilidade e design moderno.
-
----
-
-🎯 Objetivo
-
-- Permitir autenticação do usuário
-- Facilitar o acesso ao sistema
-- Oferecer login rápido com Google
-- Disponibilizar recuperação de senha e cadastro
+<p align="center">
+  <b>Aplicativo mobile para gerenciamento de estoque de motos e acessórios</b><br/>
+  Simples, intuitivo e focado em produtividade 📦
+</p>
 
 ---
 
-🧱 Estrutura da Tela
+## 🎬 Preview
 
-🔹 Container Principal
-- Fundo escuro (`#101010`)
-- Conteúdo centralizado
-- Espaçamento interno
+<p align="center">
+  <!-- Substitua por GIF do seu app -->
+  <img src="https://via.placeholder.com/300x600?text=App+Preview" width="250"/>
+</p>
 
----
-
-🔹 Logo do Aplicativo
-- Exibida com componente `Image`
-- Caminho: `../assets/images/logo.png`
-- Dimensão atual: `450x200`
+🔗 **Protótipo interativo:**
+https://www.figma.com/proto/8mc9326n5v5aGeKzwOPnt0/APP-STOCK-MOTO
 
 ---
 
-🔹 Botão "Continue com Google"
+## 🧠 Sobre o projeto
 
-- Componente: `TouchableOpacity`
-- Layout horizontal (`flexDirection: 'row'`)
-- Contém:
-  - Ícone do Google
-  - Texto descritivo
+O **Stock Moto** foi criado para resolver problemas comuns de controle de estoque em oficinas e lojas de motocicletas.
 
-📌 Características:
-- Fundo branco
-- Alinhamento central
-- Espaçamento entre elementos
+Com uma interface moderna e intuitiva, o app permite:
 
-📁 Ícone: ../assets/images/iconegoogle.jpg
+* Organizar produtos
+* Controlar quantidades
+* Visualizar estoque rapidamente
+* Gerenciar acessórios
 
 ---
 
-🔹 Campos de Entrada
+## ✨ Funcionalidades
 
-👤 Usuário
-- Placeholder: "Usuario"
+### 🔐 Autenticação
 
-🔒 Senha
-- Placeholder: "Senha"
-- Propriedade: `secureTextEntry`
+* Login
+* Criar conta
+* Recuperação de senha
 
-📌 Estilo:
-- Fundo branco
-- Bordas arredondadas
-- Borda leve
+### 🏠 Dashboard
 
----
+* Acesso rápido às categorias
+* Navegação simples e direta
 
-🔹 Botão de Login
--	Componente: TouchableOpacity 
--	Texto: "ENTRAR NA CONTA" 
-🎨 Estilo:
-- Cor: Laranja (`#f4882f`)
-- Texto branco
-- Centralizado
--	Bordas arredondadas 
+### 📦 Estoque de Motos
 
----
+* Separação por marcas:
 
-🔹 Rodapé
+  * Honda
+  * Yamaha
+  * Shineray
+* Controle de quantidade
+* Atualização em tempo real
 
-Contém:
-- "Esqueceu a senha?"
-- "Cadastre-se aqui"
-📌 Layout horizontal com espaçamento
+### 🛠️ Acessórios
 
----
-🎨 Estilização
-Utiliza `StyleSheet.create()`.
-Paleta de cores:
-- Fundo: Preto (#101010)
-- Inputs: Branco
-- Botão principal: Laranja
-- Botão Google: Branco
+* Categorias:
 
----
+  * Capacetes
+  * Baús
+  * Redes
+  * Kits
+* Gestão individual de itens
 
-⚙️ Funcionalidades
+### ➕ Cadastro
 
-✔ Interface de login pronta  
-✔ Inputs configurados  
-✔ Botão Google com ícone  
-✔ Layout organizado  
-✔ Preparado para integração com backend  
+* Criação de novos produtos
+* Formulários completos
+
+### ⚠️ Alertas
+
+* Estoque baixo
+* Indicadores visuais
+
+### 👤 Perfil & ⚙️ Configurações
+
+* Dados do usuário
+* Preferências do sistema
 
 ---
 
-🚧 Melhorias Futuras
+## 🧩 Fluxo do App
 
-- Integração com autenticação real (API)
-- Login com Google usando Expo Auth
-- Validação de campos
-- Mensagens de erro
-- Navegação entre telas
-- Responsividade (ajuste da logo)
-
----
-
-🧪 Tecnologias Utilizadas
-
-- React Native
-- Expo Go
-- JavaScript
-- StyleSheet API
-- Expo Vector Icons
+```mermaid
+graph TD
+A[Login] --> B[Dashboard]
+B --> C[Motos]
+B --> D[Acessórios]
+C --> E[Gerenciar Estoque]
+D --> F[Gerenciar Itens]
+E --> G[Atualizar Quantidade]
+F --> G
+```
 
 ---
 
-🔄 Fluxo de Uso
+## 🎨 Design
 
-1. Usuário abre o app  
-2. Visualiza a tela de login  
-3. Escolhe:
-Login com Google  
-Ou login com usuário e senha  
-4. Clica em "Entrar na conta"  
-5. Sistema realiza autenticação (futuro)
+<p align="center">
+  <!-- Substitua por imagens reais -->
+  <img src="https://via.placeholder.com/200x400?text=Login" />
+  <img src="https://via.placeholder.com/200x400?text=Dashboard" />
+  <img src="https://via.placeholder.com/200x400?text=Estoque" />
+</p>
 
----
-
-📌 Considerações Técnicas
-
-- Botão Google atualmente apenas visual
-- Ícone carregado localmente
-- Importação de ícones pronta para uso futuro
-- Layout pode ser ajustado para diferentes telas
+* 🌙 Tema escuro moderno
+* 🟧 Destaque em laranja
+* 📱 Mobile-first
+* 🔄 Navegação intuitiva
+* 🧩 Componentização
 
 ---
 
-🏁 Conclusão
+## 🛠️ Tecnologias
 
-A tela de login apresenta uma interface moderna, organizada e pronta para evolução com integração de autenticação real.
+> (planejadas para desenvolvimento)
+
+* React Native
+* Firebase
+* Figma (UI/UX)
 
 ---
 
-📸 Preview da Tela
+## 📌 Status
 
-![Tela de Login](StockMoto/assets/login.png)
+🚧 Projeto em fase de prototipação
+
+---
+
+## 🚀 Roadmap
+
+* [ ] Transformar design em código
+* [ ] Criar API de produtos
+* [ ] Implementar autenticação real
+* [ ] Notificações de estoque
+* [ ] Relatórios avançados
+
+---
 
 
