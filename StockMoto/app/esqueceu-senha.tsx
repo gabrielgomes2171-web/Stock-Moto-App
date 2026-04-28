@@ -21,13 +21,11 @@ export default function ForgotPasswordScreen() {
         style={styles.logo}
         />
 
-        {/* Title */}
         <Text style={styles.title}>Esqueceu a senha?</Text>
         <Text style={styles.subtitle}>
           Digite seu e-mail cadastrado para receber instruções de redefinição
         </Text>
 
-        {/* Input */}
         <View style={styles.inputContainer}>
           <Ionicons name="person" size={20} color="#888" />
           <TextInput
@@ -39,12 +37,12 @@ export default function ForgotPasswordScreen() {
           />
         </View>
 
-        {/* Button */}
-        <TouchableOpacity style={styles.button} onPress={handleSend}>
+        <TouchableOpacity style={styles.button} 
+        onPress={() => router.push('/verificar-email')}
+        >
           <Text style={styles.buttonText}>ENVIAR INSTRUÇÕES</Text>
         </TouchableOpacity>
 
-        {/* Footer Links */}
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.link}>Voltar para o Login</Text>
