@@ -1,9 +1,10 @@
 # 🏍️ Stock Moto
 
 <p align="center">
-  <img src="./assets/telalogin.png" width="250"/>
-  <img src="./assets/telainicial.png" width="250"/>
-  <img src="./assets/telaestoque.png" width="250"/>
+  <img src="https://img.shields.io/badge/status-em%20desenvolvimento-orange" />
+  <img src="https://img.shields.io/badge/platform-mobile-blue" />
+  <img src="https://img.shields.io/badge/design-figma-purple" />
+  <img src="https://img.shields.io/badge/license-MIT-green" />
 </p>
 
 <p align="center">
@@ -13,12 +14,6 @@
 
 ---
 
-## 🎬 Preview
-
-<p align="center">
-  <!-- Substitua por GIF do seu app -->
-  <img src="https://via.placeholder.com/300x600?text=App+Preview" width="250"/>
-</p>
 
 🔗 **Protótipo interativo:**
 https://www.figma.com/proto/8mc9326n5v5aGeKzwOPnt0/APP-STOCK-MOTO
@@ -105,13 +100,6 @@ F --> G
 
 ## 🎨 Design
 
-<p align="center">
-  <!-- Substitua por imagens reais -->
-  <img src="https://via.placeholder.com/200x400?text=Login" />
-  <img src="https://via.placeholder.com/200x400?text=Dashboard" />
-  <img src="https://via.placeholder.com/200x400?text=Estoque" />
-</p>
-
 * 🌙 Tema escuro moderno
 * 🟧 Destaque em laranja
 * 📱 Mobile-first
@@ -145,5 +133,4 @@ F --> G
 * [ ] Relatórios avançados
 
 ---
-
 
