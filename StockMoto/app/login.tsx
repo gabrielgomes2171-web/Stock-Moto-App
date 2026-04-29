@@ -48,7 +48,10 @@ export default function Login() {
         <TouchableOpacity onPress={() => router.push('/esqueceu-senha')}>
         <Text style={styles.link}>Esqueceu a senha?</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push('/cadastre-se')}>
           <Text style={styles.link}>Cadastre-se aqui</Text>
+          </TouchableOpacity>
       </View>
 
     </View>

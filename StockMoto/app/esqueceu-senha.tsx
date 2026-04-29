@@ -48,7 +48,7 @@ export default function ForgotPasswordScreen() {
           <Text style={styles.link}>Voltar para o Login</Text>
         </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/cadastre-se')}>
             <Text style={styles.link}>Cadastre-se aqui</Text>
           </TouchableOpacity>
         </View>

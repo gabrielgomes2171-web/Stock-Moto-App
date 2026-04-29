@@ -62,7 +62,7 @@ export default function RedefinirSenha() {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push('/login')}>
-        <Text style={styles.link}>Voltar para o Login</Text>
+        <Text style={styles.login}>Voltar para o Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -88,8 +88,9 @@ const styles = StyleSheet.create({
     color: '#AAA',
     fontSize: 15,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 30,  
   },
+
   inputContainer: {
   flexDirection: 'row',
   alignItems: 'center',
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
   borderRadius: 8,
   paddingHorizontal: 12,
   marginBottom: 12,
-},
+  },
 
 input: {
   flex: 1,
@@ -108,20 +109,20 @@ input: {
   marginLeft: 10,
 },
 
-  button: {
-    backgroundColor: '#FF7A00',
-    padding: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-  },
+button: {
+  backgroundColor: '#FF7A00',
+  padding: 14,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginTop: 20,
+},
 
   buttonText: {
     color: '#FFF',
     fontWeight: 'bold',
   },
 
-  link: {
+  login: {
     color: '#4DA6FF',
     textAlign: 'center',
     marginTop: 16,
