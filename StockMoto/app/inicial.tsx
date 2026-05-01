@@ -22,7 +22,7 @@ export default function Inicial() {
             <Text style={styles.brand}>Moto Stock</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push('/perfil')}>
+          <TouchableOpacity onPress={() => router.push('/configuracoes')}>
             <Ionicons name="settings-outline" size={22} color="#000" />
           </TouchableOpacity>
         </View>

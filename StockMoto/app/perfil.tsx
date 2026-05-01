@@ -3,12 +3,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import { replace } from "expo-router/build/global-state/routing";
 import { useRouter } from 'expo-router';
+import Footer from "../components/Footer";
 
 export default function Perfil() {
   const router = useRouter();
   return (
 
     <SafeAreaView style={styles.container}>
+      <Footer />
       
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Editar Perfil</Text>
@@ -73,13 +75,13 @@ export default function Perfil() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1E1E1E",
+    backgroundColor: "#0D0D0D",
+    padding: -20,
   },
 
   header: {
     backgroundColor: "#F47C20",
-    paddingVertical: 30,
-    paddingHorizontal: 20,
+    padding: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     alignItems: "center",
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
   },
 
   profileCard: {
-    backgroundColor: "#5e5d5d",
+    backgroundColor: "#2A2A2A",
     margin: 20,
     borderRadius: 12,
     alignItems: "center",
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#5e5d5d",
+    borderColor: "#2A2A2A",
   },
 
   name: {
@@ -156,7 +158,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#5e5d5d",
+    backgroundColor: "#2A2A2A",
     marginHorizontal: 20,
     borderRadius: 12,
     padding: 16,
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "#2A2A2A",
+    backgroundColor: "#adadad63",
     borderRadius: 8,
     padding: 12,
     color: "#fff",
@@ -189,10 +191,10 @@ const styles = StyleSheet.create({
   },
 
   logoutCard: {
-    backgroundColor: "#5e5d5d",
+    backgroundColor: "#2A2A2A",
     margin: 20,
     borderRadius: 12,
-    padding: 16,
+    padding: 15,
   },
 
   logoutTitle: {
