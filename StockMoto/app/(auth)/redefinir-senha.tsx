@@ -23,11 +23,13 @@ export default function RedefinirSenha() {
         <Ionicons name="lock-closed-outline" size={20} color="#0D0D0D" />
 
       <TextInput
-        placeholder="Nova senha"
-        placeholderTextColor="#999"
-        secureTextEntry={!showPassword}
-        style={styles.input}
-      />
+          placeholder="Nova senha"
+          placeholderTextColor="#999"
+          secureTextEntry={!showPassword}
+          style={styles.input}
+          value={senha}
+          onChangeText={setSenha}
+        />
 
       <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Ionicons
@@ -42,11 +44,13 @@ export default function RedefinirSenha() {
           <Ionicons name="lock-open-outline" size={20} color="#0D0D0D" />
 
       <TextInput
-        placeholder="Confirmar senha"
-        placeholderTextColor="#999"
-        secureTextEntry={!showConfirmPassword}
-        style={styles.input}
-      />
+          placeholder="Confirmar senha"
+          placeholderTextColor="#999"
+          secureTextEntry={!showConfirmPassword}
+          style={styles.input}
+          value={confirmarSenha}
+          onChangeText={setConfirmarSenha}
+        />
 
       <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
           <Ionicons

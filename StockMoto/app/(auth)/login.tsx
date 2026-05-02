@@ -1,25 +1,26 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
-import { AntDesign } from "@expo/vector-icons"
+import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from '@expo/vector-icons';
-import PrimaryButton from '../components/PrimaryButton';
+import PrimaryButton from '../../components/PrimaryButton';
 import { useRouter } from 'expo-router';
-
 
 export default function Login() {
   const router = useRouter();
+
   return (
     <View style={styles.container}>
       
       <Image
-        source={require('../assets/images/logo.png')} 
+        source={require('../../assets/images/logo.png')}
         style={styles.logo}
       />
 
       <TouchableOpacity style={styles.googleButton}>
-       <Image
-       source={require('../assets/images/iconegoogle.jpg')}
-       style={{ width: 24, height: 24 }} resizeMode="contain"
-       />
+        <Image
+          source={require('../../assets/images/iconegoogle.png')}
+          style={{ width: 24, height: 24 }}
+          resizeMode="contain"
+        />
         <Text style={styles.googleText}>Continue com a Conta Google</Text>
       </TouchableOpacity>
 
@@ -37,7 +38,7 @@ export default function Login() {
       />
 
       <PrimaryButton
-        title='ENTRAR NA CONTA'
+        title="ENTRAR NA CONTA"
         onPress={() => {
           Alert.alert('Bem Vindo Novamente!');
           router.replace('/inicial');
@@ -46,12 +47,12 @@ export default function Login() {
 
       <View style={styles.footer}>
         <TouchableOpacity onPress={() => router.push('/esqueceu-senha')}>
-        <Text style={styles.link}>Esqueceu a senha?</Text>
+          <Text style={styles.link}>Esqueceu a senha?</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push('/cadastre-se')}>
           <Text style={styles.link}>Cadastre-se aqui</Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
       </View>
 
     </View>
@@ -70,35 +71,19 @@ const styles = StyleSheet.create({
     width: 450,
     height: 200,
     marginBottom: 20,
-    borderRadius: 0,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1E293B',
-    textAlign: 'center',
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    gap: 10,
   },
-  subtitle: {
-    color: '#64748B',
-    marginBottom: 20,
-  },
-googleButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: '#fff',
-  padding: 15,
-  borderRadius: 8,
-  gap: 10,
-},
   googleText: {
     color: '#000',
     fontWeight: '500',
-  },
-  googleIcon: {
-  width: '20%',
-  height: '20%',
-  resizeMode: 'contain',
   },
   or: {
     marginVertical: 10,
@@ -112,18 +97,6 @@ googleButton: {
     marginBottom: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-  },
-  button: {
-    backgroundColor: '#f4882f',
-    padding: 14,
-    borderRadius: 10,
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
   },
   footer: {
     flexDirection: 'row',

@@ -1,24 +1,20 @@
 import React, { useState } from 'react';
-import {View,Text,TextInput,TouchableOpacity,StyleSheet, Image} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function ForgotPasswordScreen() {
+export default function EsqueceuSenhaScreen() {
   const [email, setEmail] = useState('');
   const router = useRouter();
-
-  const handleSend = () => {
-    console.log('Enviar instruções para:', email);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
 
         <Image
-        source={require('../assets/images/logo.png')} 
-        style={styles.logo}
+          source={require('../../assets/images/logo.png')} 
+          style={styles.logo}
         />
 
         <Text style={styles.title}>Esqueceu a senha?</Text>
@@ -38,15 +34,16 @@ export default function ForgotPasswordScreen() {
         </View>
 
         <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.push('/verificar-email')}>
+          style={styles.button}
+          onPress={() => router.push('/verificar-email')}
+        >
           <Text style={styles.buttonText}>ENVIAR INSTRUÇÕES</Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
 
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.link}>Voltar para o Login</Text>
-        </TouchableOpacity>
+            <Text style={styles.link}>Voltar para o Login</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push('/cadastre-se')}>
             <Text style={styles.link}>Cadastre-se aqui</Text>
@@ -70,24 +67,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   logo: {
-  width: 450,
-  height: 200,
-  marginBottom: 20,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 50
-  },
-  logoText: {
-    color: '#FFF',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 10
-  },
-  subLogo: {
-    color: '#FF7A00',
-    fontSize: 12,
-    letterSpacing: 2
+    width: 450,
+    height: 200,
+    marginBottom: 20,
   },
   title: {
     color: '#FFF',
