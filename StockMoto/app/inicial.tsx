@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from 'reac
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ImageSourcePropType} from 'react-native';
+import Footer from "../components/Footer";
 
 export default function Inicial() {
   const router = useRouter();
@@ -81,9 +82,6 @@ export default function Inicial() {
           <Ionicons name="add-circle-outline" size={26} color="#555" />
         </TouchableOpacity>
 
-        <View style={styles.activeTab}>
-          <Ionicons name="grid" size={24} color="#F47B20" />
-        </View>
 
         <TouchableOpacity onPress={() => navigation.navigate("Orcamentos")}>
           <Feather name="dollar-sign" size={22} color="#555" />
@@ -94,7 +92,7 @@ export default function Inicial() {
         </TouchableOpacity>
 
       </View>
-
+      <Footer active='inicial' /> 
     </View>
   );
 }
