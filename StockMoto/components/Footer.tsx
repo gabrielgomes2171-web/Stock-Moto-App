@@ -2,31 +2,91 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-export default function Footer() {
+type Props = {
+  active?: "estoque" | "cadastrar" | "inicial" | "orcamentos" | "alertas";
+};
+
+export default function Footer({ active }: Props) {
   const router = useRouter();
+
+  const renderIcon = (
+    name: string,
+    icon: (isActive: boolean) => React.ReactNode,
+    route: any
+  ) => {
+    const isActive = active === name;
+
+    return (
+      <TouchableOpacity onPress={() => router.replace(route)}>
+        <View style={isActive ? styles.activeTab : undefined}>
+          {icon(isActive)}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.footer}>
+      
+      {renderIcon(
+        "estoque",
+        (isActive) => (
+          <MaterialIcons
+            name="inventory"
+            size={24}
+            color={isActive ? "#F47B20" : "#555"}
+          />
+        ),
+        "/estoque"
+      )}
 
-      <TouchableOpacity onPress={() => router.push("/estoque")}>
-        <MaterialIcons name="inventory" size={24} color="#555" />
-      </TouchableOpacity>
+      {renderIcon(
+        "cadastrar",
+        (isActive) => (
+          <Ionicons
+            name="add-circle-outline"
+            size={26}
+            color={isActive ? "#F47B20" : "#555"}
+          />
+        ),
+        "/cadastrar"
+      )}
 
-      <TouchableOpacity onPress={() => router.push("/cadastrar")}>
-        <Ionicons name="add-circle-outline" size={26} color="#555" />
-      </TouchableOpacity>
+      {renderIcon(
+        "inicial",
+        (isActive) => (
+          <Ionicons
+            name="grid"
+            size={24}
+            color={isActive ? "#F47B20" : "#555"}
+          />
+        ),
+        "/inicial"
+      )}
 
-      <TouchableOpacity onPress={() => router.push("/inicial")}>
-        <Ionicons name="grid" size={24} color="#555" />
-      </TouchableOpacity>
+      {renderIcon(
+        "orcamentos",
+        (isActive) => (
+          <Feather
+            name="dollar-sign"
+            size={22}
+            color={isActive ? "#F47B20" : "#555"}
+          />
+        ),
+        "/orcamentos"
+      )}
 
-      <TouchableOpacity onPress={() => router.push("/orcamentos")}>
-        <Feather name="dollar-sign" size={22} color="#555" />
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => router.push("/alertas")}>
-        <Ionicons name="warning-outline" size={24} color="#555" />
-      </TouchableOpacity>
+      {renderIcon(
+        "alertas",
+        (isActive) => (
+          <Ionicons
+            name="warning-outline"
+            size={24}
+            color={isActive ? "#F47B20" : "#555"}
+          />
+        ),
+        "/alertas"
+      )}
 
     </View>
   );
@@ -34,20 +94,20 @@ export default function Footer() {
 
 const styles = StyleSheet.create({
   footer: {
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  right: 0,
-  height: 70,
-  backgroundColor: "#fff",
-  flexDirection: "row",
-  justifyContent: "space-around",
-  alignItems: "center",
-},
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
 
   activeTab: {
     backgroundColor: "#fff3e9",
-    padding: 12,
-    borderRadius: 10,
+    padding: 0,
+    borderRadius: 12,
   },
 });

@@ -32,13 +32,17 @@ export default function Header({
               </TouchableOpacity>
             )}
 
-            <View style={styles.profile}>
+            <TouchableOpacity
+              style={styles.profile}
+              onPress={() => router.push("/perfil")}
+            >
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>M</Text>
               </View>
               <Text style={styles.brand}>Moto Stock</Text>
-            </View>
-          </View>
+            </TouchableOpacity>
+
+       </View>
 
 
           {showSettings && (
@@ -62,7 +66,7 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: "#F47B20",
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     paddingBottom: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -102,7 +106,8 @@ const styles = StyleSheet.create({
 
   brand: {
     color: "#fff",
-    fontSize: 12,
+    fontWeight: "bold",
+
   },
 
   title: {

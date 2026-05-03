@@ -14,7 +14,6 @@ export default function Configuracoes() {
   return (
     
     <View style={styles.container}>
-       <Footer />
 
       <View style={styles.header}>
         <View style={styles.headerTop}>
@@ -89,6 +88,7 @@ export default function Configuracoes() {
           />
         </View>
       </View>
+      <Footer />
     </View>
   );
 }
@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F47B20",
     padding: 20,
     marginBottom: 15,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
 
   headerTop: {
@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
   profile: {
     flexDirection: "row",
     alignItems: "center",
+    marginLeft: 8,
   },
 
   avatar: {

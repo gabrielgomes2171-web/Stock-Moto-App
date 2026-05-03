@@ -45,7 +45,7 @@ export default function Inicial() {
           title="Meu Estoque"
           subtitle="Pesquisar peças e acessórios"
           image={require("../assets/images/estoque.png")}
-          onPress={() => navigation.navigate("Estoque")}
+          onPress={() => router.push("/estoque")}
         />
 
         <Card
@@ -73,7 +73,7 @@ export default function Inicial() {
 
       <View style={styles.footer}>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Estoque")}>
+        <TouchableOpacity onPress={() => router.push("/estoque")}>
           <MaterialIcons name="inventory" size={24} color="#555" />
         </TouchableOpacity>
 
@@ -127,8 +127,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F47B20",
     padding: 20,
     marginBottom: 15,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
 
   headerTop: {
