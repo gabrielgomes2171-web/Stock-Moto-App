@@ -1,4 +1,4 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -11,6 +11,7 @@ export default function Footer({ active }: Props) {
 
   const renderIcon = (
     name: string,
+    label: string,
     icon: (isActive: boolean) => React.ReactNode,
     route: any
   ) => {
@@ -18,8 +19,16 @@ export default function Footer({ active }: Props) {
 
     return (
       <TouchableOpacity onPress={() => router.replace(route)}>
-        <View style={isActive ? styles.activeTab : undefined}>
-          {icon(isActive)}
+        <View style={styles.tabContainer}>
+          
+          <View style={isActive ? styles.activeTab : undefined}>
+            {icon(isActive)}
+          </View>
+
+          <Text style={[styles.label, isActive && styles.activeLabel]}>
+            {label}
+          </Text>
+
         </View>
       </TouchableOpacity>
     );
@@ -30,10 +39,11 @@ export default function Footer({ active }: Props) {
       
       {renderIcon(
         "estoque",
+        "ESTOQUE",
         (isActive) => (
           <MaterialIcons
             name="inventory"
-            size={24}
+            size={28}
             color={isActive ? "#F47B20" : "#555"}
           />
         ),
@@ -42,10 +52,11 @@ export default function Footer({ active }: Props) {
 
       {renderIcon(
         "cadastrar",
+        "CADASTRAR",
         (isActive) => (
           <Ionicons
             name="add-circle-outline"
-            size={26}
+            size={28}
             color={isActive ? "#F47B20" : "#555"}
           />
         ),
@@ -54,10 +65,11 @@ export default function Footer({ active }: Props) {
 
       {renderIcon(
         "inicial",
+        "INÍCIO",
         (isActive) => (
           <Ionicons
             name="grid"
-            size={24}
+            size={28}
             color={isActive ? "#F47B20" : "#555"}
           />
         ),
@@ -66,10 +78,11 @@ export default function Footer({ active }: Props) {
 
       {renderIcon(
         "orcamentos",
+        "ORÇAMENTOS",
         (isActive) => (
           <Feather
             name="dollar-sign"
-            size={22}
+            size={28}
             color={isActive ? "#F47B20" : "#555"}
           />
         ),
@@ -78,10 +91,11 @@ export default function Footer({ active }: Props) {
 
       {renderIcon(
         "alertas",
+        "ALERTAS",
         (isActive) => (
           <Ionicons
             name="warning-outline"
-            size={24}
+            size={28}
             color={isActive ? "#F47B20" : "#555"}
           />
         ),
@@ -105,9 +119,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  tabContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   activeTab: {
     backgroundColor: "#fff3e9",
     padding: 0,
     borderRadius: 12,
+  },
+
+  label: {
+    fontSize: 10,
+    color: "#555",
+    marginTop: 2,
+  },
+
+  activeLabel: {
+    color: "#F47B20",
+    fontWeight: "bold",
   },
 });
