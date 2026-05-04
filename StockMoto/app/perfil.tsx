@@ -31,14 +31,12 @@ export default function Perfil() {
           </TouchableOpacity>
         </View>
 
-        {/* INFO */}
         <Text style={styles.name}>Moto Stock</Text>
         <Text style={styles.email}>
           stockmotopeca@gmail.com
         </Text>
 
       </View>
-
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Informações Pessoais</Text>
@@ -82,8 +80,8 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "#F47C20",
     padding: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     alignItems: "center",
   },
 

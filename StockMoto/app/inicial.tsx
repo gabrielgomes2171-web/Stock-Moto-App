@@ -67,7 +67,7 @@ export default function Inicial() {
           title="Orçamentos"
           subtitle="Visualizar e criar"
           image={require("../assets/images/orcamentos.png")}
-          onPress={() => navigation.navigate("Orcamentos")}
+          onPress={() => router.push("/orcamentos")}
         />
 
       </View>
@@ -83,7 +83,7 @@ export default function Inicial() {
         </TouchableOpacity>
 
 
-        <TouchableOpacity onPress={() => navigation.navigate("Orcamentos")}>
+        <TouchableOpacity onPress={() => router.push("/orcamentos")}>
           <Feather name="dollar-sign" size={22} color="#555" />
         </TouchableOpacity>
 
