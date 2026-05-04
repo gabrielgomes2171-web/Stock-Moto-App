@@ -53,7 +53,7 @@ export default function Inicial() {
           title="Alertas"
           subtitle="Alertas de estoque"
           image={require("../assets/images/alerta.png")}
-          onPress={() => navigation.navigate("Alertas")}
+          onPress={() => router.push("/alertas")}
         />
 
         <Card
@@ -87,7 +87,7 @@ export default function Inicial() {
           <Feather name="dollar-sign" size={22} color="#555" />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Alertas")}>
+        <TouchableOpacity onPress={() => router.push("/alertas")}>
           <Ionicons name="warning-outline" size={24} color="#555" />
         </TouchableOpacity>
 
