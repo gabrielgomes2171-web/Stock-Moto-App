@@ -15,7 +15,7 @@ export default function Estoque(){
                 <Text style={styles.sectionTitle}>MARCAS DE MOTOS</Text>
                 <Text style={styles.subtitle}>Pesquise por Marcas</Text>
 
-                <View style={styles.row}>
+                <View style={styles.rowCenter}>
 
                 <TouchableOpacity
                   style={styles.brandCard}
@@ -120,6 +120,11 @@ const styles = StyleSheet.create({
     height: 80,
     resizeMode: "contain",
     marginBottom: 8,
+  },
+
+  rowCenter: {
+  flexDirection: "row",
+  justifyContent: "center",
   },
 
   row: {

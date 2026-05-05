@@ -11,14 +11,19 @@ export default function EstoqueHonda() {
 
             <View style={styles.content}>
 
-                <View style={styles.brandContainer}>
+                <View style={styles.brandBox}>
+                    
                     <Image
                         source={require("../assets/images/honda.png")}
                         style={styles.brandLogo}
-                        resizeMode="contain"
                     />
-                    <Text style={styles.brandText}>ESCOLHA O MODELO</Text>
+
+                    <View style={styles.brandTextContainer}>
+                    <Text style={styles.brandTitle}>HONDA</Text>
+                    <Text style={styles.brandSubtitle}>ESCOLHA O MODELO</Text>
                 </View>
+              </View>
+              
 
                 <View style={styles.grid}>
 
@@ -45,6 +50,17 @@ export default function EstoqueHonda() {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.card}>
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>CG 160 TITAN</Text>
+                  </View>
+
+                  <Image
+                    source={require("../assets/images/cg160titan.png")}
+                    style={styles.image}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.card}>
                     <View style={styles.badge}>
                        <Text style={styles.badgeText}>CG 160 CARGO</Text> 
                     </View>
@@ -66,7 +82,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#101010",
-    justifyContent: "space-between",
   },
   
   content: {
@@ -74,21 +89,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  brandContainer: {
+  brandBox: {
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#2A2A2A",
+    padding: 12,
+    borderRadius: 10,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#3A3A3A",
   },
 
   brandLogo: {
-    width: 120,
-    height: 40,
-    marginBottom: 8,
+    width: 90,
+    height: 50,
+    marginBottom: 10,
+    resizeMode: "contain",
+    marginRight: 12,
+    borderRadius: 5,
   },
 
-  brandText: {
+  brandTextContainer: {
+  justifyContent: "center",
+  },
+
+  brandTitle: {
     color: "#fff",
-    fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+
+  brandSubtitle: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 15,
   },
 
   grid: {
@@ -100,30 +134,34 @@ const styles = StyleSheet.create({
   card: {
     width: "48%",
     backgroundColor: "#fff",
-    borderRadius: 10,
-    marginBottom: 16,
-    padding: 10,
+    borderRadius: 12,
+    marginBottom: 40,
+    padding: 20,
     alignItems: "center",
   },
 
   badge: {
+    position: "absolute",
+    top: -8,
+    left: -8,
     backgroundColor: "#FF7A00",
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    marginBottom: 8,
+    paddingVertical: 3,
+    borderRadius: 5,
+    zIndex: 1,
   },
 
   badgeText: {
     color: "#000",
-    fontSize: 10,
+    fontSize: 14,
     fontWeight: "bold",
   },
 
   image: {
     width: "100%",
-    height: 80,
+    height: 100,
     resizeMode: "contain",
+    marginTop: 10,
   },
 });
   
