@@ -1,8 +1,10 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useRouter } from 'expo-router';
 
 export default function Estoque(){
+    const router = useRouter();
     return(
 
         <View style={styles.container}>
@@ -15,14 +17,17 @@ export default function Estoque(){
 
                 <View style={styles.row}>
 
-
-                </View>
-                <View style={styles.brandCard}>
+                <TouchableOpacity
+                  style={styles.brandCard}
+                  onPress={() => router.push('/estoquehonda')}
+                >
                     <Image
                         source={require('../assets/images/honda.png')}
                         style={styles.brandImage}
                     />
                     <Text style={styles.cardLabel}>HONDA</Text>
+                </TouchableOpacity>
+
                 </View>
 
                 <Text style={styles.sectionTitle}>ACESSÓRIOS</Text>
