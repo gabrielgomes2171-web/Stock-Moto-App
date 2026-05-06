@@ -33,7 +33,7 @@ export default function Orcamentos() {
 
         <TouchableOpacity 
             style={styles.button}
-            onPress={() => router.push("/criarorcamentos")}
+            onPress={() => router.push("/criarorcamento")}
         >
             <Text style={styles.buttonText}>+ Novo Orçamento</Text>
         </TouchableOpacity>
