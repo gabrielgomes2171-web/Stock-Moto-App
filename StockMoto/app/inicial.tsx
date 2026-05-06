@@ -60,7 +60,7 @@ export default function Inicial() {
           title="Cadastrar"
           subtitle="Cadastre peças e acessórios"
           image={require("../assets/images/cadastrar.png")}
-          onPress={() => navigation.navigate("Cadastrar")}
+          onPress={() => router.push("/cadastrar")}
         />
 
         <Card
@@ -78,7 +78,7 @@ export default function Inicial() {
           <MaterialIcons name="inventory" size={24} color="#555" />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate("Cadastrar")}>
+        <TouchableOpacity onPress={() => router.push("/cadastrar")}>
           <Ionicons name="add-circle-outline" size={26} color="#555" />
         </TouchableOpacity>
 
