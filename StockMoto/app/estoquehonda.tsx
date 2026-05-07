@@ -31,7 +31,7 @@ export default function EstoqueHonda() {
 
                     <TouchableOpacity 
                     style={styles.card}
-                      onPress={() => router.push("/estoquestart160")}
+                    onPress={() => router.push("/estoquestart160")}
                     >
                       
                     <View style={styles.badge}>
@@ -44,7 +44,11 @@ export default function EstoqueHonda() {
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.card}>
+                    <TouchableOpacity 
+                    style={styles.card}
+                    onPress={() => router.push("/estoquefan160")}
+                    >
+                      
                     <View style={styles.badge}>
                        <Text style={styles.badgeText}>CG 160 FAN</Text>
                     </View>
