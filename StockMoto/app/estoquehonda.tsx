@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, } from "react-native";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useRouter } from "expo-router";
 
 export default function EstoqueHonda() {
-     return (
+    const router = useRouter();
+    return (
 
         <View style={styles.container}>
 
@@ -27,7 +29,11 @@ export default function EstoqueHonda() {
 
                 <View style={styles.grid}>
 
-                    <TouchableOpacity style={styles.card}>
+                    <TouchableOpacity 
+                    style={styles.card}
+                      onPress={() => router.push("/estoquestart160")}
+                    >
+                      
                     <View style={styles.badge}>
                         <Text style={styles.badgeText}>CG 160 START</Text>
                     </View>
