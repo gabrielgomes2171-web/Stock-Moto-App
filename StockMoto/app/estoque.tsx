@@ -34,25 +34,31 @@ export default function Estoque(){
 
                 <View style={styles.row}>
 
-                    <View style={styles.accessoryCard}>
+                    <TouchableOpacity
+                      style={styles.accessoryCard}
+                      onPress={() => router.push('/capacetes')}
+                    >
                         <Image
                             source={require('../assets/images/capacete.png')}
                             style={styles.accessoryImage}
                         />
                         <Text style={styles.cardLabel}>CAPACETES</Text>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={styles.accessoryCard}>
+                    <TouchableOpacity
+                    style={styles.accessoryCard}
+                    onPress={() => router.push('/bau')}
+                    >
                         <Image
                             source={require('../assets/images/bau.png')}
                             style={styles.accessoryImage}
                         />
                         <Text style={styles.cardLabel}>BAÚ</Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
             </View>
             <Footer active='estoque' />   
-        </View>
+            </View>
     );
 }
 
