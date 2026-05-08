@@ -51,8 +51,7 @@ Com uma interface moderna e intuitiva, o app permite:
 * Separação por marcas:
 
   * Honda
-  * Yamaha
-  * Shineray
+    
 * Controle de quantidade
 * Atualização em tempo real
 
@@ -62,8 +61,7 @@ Com uma interface moderna e intuitiva, o app permite:
 
   * Capacetes
   * Baús
-  * Redes
-  * Kits
+    
 * Gestão individual de itens
 
 ### ➕ Cadastro
