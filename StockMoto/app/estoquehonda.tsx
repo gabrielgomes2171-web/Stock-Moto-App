@@ -74,7 +74,10 @@ export default function EstoqueHonda() {
                   />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.card}>
+                <TouchableOpacity 
+                style={styles.card}
+                onPress={() => router.push("/estoquecargo160")}
+                  >
                     <View style={styles.badge}>
                        <Text style={styles.badgeText}>CG 160 CARGO</Text> 
                     </View>
