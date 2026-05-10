@@ -19,16 +19,6 @@ export default function Login() {
         
       />
 
-      <TouchableOpacity style={styles.googleButton}>
-        <Image
-          source={require('../../assets/images/iconegoogle.png')}
-          style={{ width: 24, height: 24 }}
-          resizeMode="contain"
-        />
-        <Text style={styles.googleText}>Entrar com a Conta Google</Text>
-      </TouchableOpacity>
-
-
         <View style={styles.inputContainer}>
         <Ionicons name='person-outline' size={18} color='#0D0D0D' />
         <TextInput
@@ -103,29 +93,7 @@ const styles = StyleSheet.create({
     width: 450,
     height: 200,
     marginBottom: 20,
-  },
 
-  googleButton: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF',
-    paddingVertical: 14,
-    borderRadius: 10,
-    marginBottom: 20,
-    gap: 10,
-  },
-
-  googleIcon: {
-    width: 22,
-    height: 22,
-  },
-
-  googleText: {
-    color: '#000',
-    fontSize: 14,
-    fontWeight: '500',
   },
 
   inputContainer: {
