@@ -3,6 +3,7 @@ import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ImageSourcePropType} from 'react-native';
 import Footer from "../components/Footer";
+import Header from "../components/Header";
 
 export default function Inicial() {
   const router = useRouter();
@@ -10,26 +11,10 @@ export default function Inicial() {
   return (
     <View style={styles.container}>
 
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-
-          <TouchableOpacity
-            style={styles.profile}
-            onPress={() => router.push('/perfil')}
-          >
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>M</Text>
-            </View>
-            <Text style={styles.brand}>Moto Stock</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => router.push('/configuracoes')}>
-            <Ionicons name="settings-outline" size={22} color="#000" />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.title}>Painel de Controle</Text>
-      </View>
+      <Header
+        title="Painel de Controle"
+        showSettings={true}
+      />
 
       <View style={styles.searchContainer}>
         <TextInput
@@ -174,6 +159,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,
+    marginTop: 15,
+    marginHorizontal: 15,
   },
 
   search: {
@@ -186,6 +173,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     marginBottom: 80,
+    paddingHorizontal: 15,
   },
 
   card: {

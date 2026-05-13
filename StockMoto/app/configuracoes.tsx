@@ -4,12 +4,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import Footer from "../components/Footer";
+import { useUser } from "../contexts/UserContext";
+import { Image } from "react-native";
 
 export default function Configuracoes() {
   const [minimo, setMinimo] = useState(true);
   const [zerado, setZerado] = useState(true);
   const [orcamento, setOrcamento] = useState(false);
   const router = useRouter();
+  const { nome, imagem } = useUser();
 
   return (
     
@@ -23,9 +26,15 @@ export default function Configuracoes() {
             onPress={() => router.push("/perfil")}
           >
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>M</Text>
+              {imagem ? (
+                <Image source={{ uri: imagem }} style={styles.avatarImage} />
+                 ) : (
+                  <Text style={styles.avatarText}>
+                    {nome ? nome.charAt(0) : "M"}
+                  </Text>
+                  )}
             </View>
-            <Text style={styles.brand}>Moto Stock</Text>
+            <Text style={styles.brand}>{nome}</Text>
           </TouchableOpacity>
 
       </View>
@@ -134,6 +143,12 @@ const styles = StyleSheet.create({
   avatarText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+
+  avatarImage: {
+  width: "100%",
+  height: "100%",
+  borderRadius: 20,
   },
 
   brand: {

@@ -4,14 +4,32 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useState, useEffect, } from 'react';
+import { useUser } from "../contexts/UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Perfil() {
   const router = useRouter();
-  const [nome, setNome] = useState("Moto Stock");
-  const [imagem, setImagem] = useState<string | null>(null);
+  const { nome, setNome, imagem, setImagem } = useUser();
 
-  function salvarPerfil() {
+  useEffect(() => {
+    carregarPerfil();
+   }, []);
+
+  async function carregarPerfil() {
+    const nomeSalvo = await AsyncStorage.getItem("@nome");
+    const imagemSalva = await AsyncStorage.getItem("@imagem");
+
+    if (nomeSalvo) setNome(nomeSalvo);
+    if (imagemSalva) setImagem(imagemSalva);
+  }
+  
+  async function salvarPerfil() {
+    await AsyncStorage.setItem("@nome", nome);
+    
+    if (imagem) {
+      await AsyncStorage.setItem("@imagem", imagem);
+    } 
     alert("Perfil salvo com sucesso!");
   }
 
@@ -59,7 +77,9 @@ export default function Perfil() {
               style={styles.avatarImage}
             />
             ) : (
-              <Text style={styles.avatarText}>MT</Text>
+              <Text style={styles.avatarText}>
+                {nome ? nome.charAt(0) : "M"}
+              </Text>
               )}
 
             </View>
@@ -95,9 +115,9 @@ export default function Perfil() {
         />
 
         <TouchableOpacity
-         style={styles.saveButton}
-        onPress={salvarPerfil}
-       >
+          style={styles.saveButton}
+          onPress={salvarPerfil}
+        >
         
           <Text style={styles.saveText}>SALVAR</Text>
         </TouchableOpacity> 
@@ -125,7 +145,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#0D0D0D",
-    padding: -20,
   },
 
   header: {
@@ -162,7 +181,7 @@ const styles = StyleSheet.create({
   avatarImage: {
   width: "100%",
   height: "100%",
-  borderRadius: 45,
+  borderRadius: 50,
   },
 
   avatarWrapper: {
