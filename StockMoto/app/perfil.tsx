@@ -1,12 +1,40 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
-import { replace } from "expo-router/build/global-state/routing";
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
+import * as ImagePicker from 'expo-image-picker';
+import { useState } from 'react';
 
 export default function Perfil() {
   const router = useRouter();
+  const [nome, setNome] = useState("Moto Stock");
+  const [imagem, setImagem] = useState<string | null>(null);
+
+  function salvarPerfil() {
+    alert("Perfil salvo com sucesso!");
+  }
+
+  async function selecionarImagem() {
+    const permission =
+    await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+       alert("Permissão necessária!");
+       return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+     });
+
+     if (!result.canceled) {
+      setImagem(result.assets[0].uri);
+      }
+  }
   return (
 
     <SafeAreaView style={styles.container}>
@@ -22,16 +50,33 @@ export default function Perfil() {
       <View style={styles.profileCard}>
 
         <View style={styles.avatarWrapper}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>MT</Text>
-          </View>
 
-          <TouchableOpacity style={styles.cameraButton}>
-            <Ionicons name="camera" size={16} color="#fff" />
+          <View style={styles.avatar}>
+
+            {imagem ? (
+              <Image
+              source={{ uri: imagem }}
+              style={styles.avatarImage}
+            />
+            ) : (
+              <Text style={styles.avatarText}>MT</Text>
+              )}
+
+            </View>
+
+          <TouchableOpacity
+            style={styles.cameraButton}
+            onPress={selecionarImagem}
+          >
+            <Ionicons
+            name="camera"
+            size={16}
+            color="#fff"
+            />
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.name}>Moto Stock</Text>
+        <Text style={styles.name}>{nome}</Text>
         <Text style={styles.email}>
           stockmotopeca@gmail.com
         </Text>
@@ -42,14 +87,20 @@ export default function Perfil() {
         <Text style={styles.cardTitle}>Informações Pessoais</Text>
 
         <TextInput
+          value={nome}
+          onChangeText={setNome}
           placeholder="Nome Completo"
           placeholderTextColor="#aaa"
           style={styles.input}
         />
 
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity
+         style={styles.saveButton}
+        onPress={salvarPerfil}
+       >
+        
           <Text style={styles.saveText}>SALVAR</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> 
       </View>
 
       <View style={styles.logoutCard}>
@@ -106,6 +157,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 60,
     paddingBottom: 20,
+  },
+
+  avatarImage: {
+  width: "100%",
+  height: "100%",
+  borderRadius: 45,
   },
 
   avatarWrapper: {
