@@ -110,9 +110,9 @@ const styles = StyleSheet.create({
   footer: {
     position: "absolute",
     bottom: 0,
-    left: 0,
+    left: 1,
     right: 0,
-    height: 70,
+    height: 80,
     backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-around",
