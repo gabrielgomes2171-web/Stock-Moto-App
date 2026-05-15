@@ -75,7 +75,7 @@ export default function RedefinirSenha() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D0D0D',
+    backgroundColor: '#101010',
     justifyContent: 'center',
     paddingHorizontal: 24,
   },

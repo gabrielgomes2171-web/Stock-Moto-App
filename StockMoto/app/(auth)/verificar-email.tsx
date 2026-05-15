@@ -106,7 +106,7 @@ export default function VerificarEmail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0B0B',
+    backgroundColor: '#101010',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
