@@ -48,7 +48,7 @@ export default function Cadastrar() {
                         multiline
                     />
 
-                    <View style={{ height: 80 }} />
+                    <View style={{ height: 150 }} />
                 </ScrollView>
 
                 <View style={styles.fixedButtonContainer}>
@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
   },
   form: {
     padding: 16,
+
   },
   imageUpload: {
     backgroundColor: '#1e1e1e',
@@ -142,13 +143,11 @@ const styles = StyleSheet.create({
 
   fixedButtonContainer: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 110,
     left: 0,
     right: 0,
     padding: 16,
-    backgroundColor: '#121212',
-    borderTopWidth: 1,
-    borderTopColor: '#222',
+    backgroundColor:'transparent',
   },
 
   buttonText: {

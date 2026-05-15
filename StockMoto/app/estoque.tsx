@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 30,
     paddingTop: 0,
-    paddingBottom: 100,
+    paddingBottom: 160,
   },
 
   sectionTitle: {

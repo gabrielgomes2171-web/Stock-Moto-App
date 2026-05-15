@@ -235,13 +235,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#2A2A2A",
     marginHorizontal: 20,
     borderRadius: 12,
-    padding: 16,
+    padding: 15,
   },
 
   cardTitle: {
     color: "#fff",
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 5,
   },
 
   input: {
@@ -266,9 +266,9 @@ const styles = StyleSheet.create({
 
   logoutCard: {
     backgroundColor: "#2A2A2A",
-    margin: 20,
+    margin: 10,
     borderRadius: 12,
-    padding: 15,
+    padding: 10,
   },
 
   logoutTitle: {

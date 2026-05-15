@@ -57,26 +57,6 @@ export default function Inicial() {
 
       </View>
 
-      <View style={styles.footer}>
-
-        <TouchableOpacity onPress={() => router.push("/estoque")}>
-          <MaterialIcons name="inventory" size={24} color="#555" />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.push("/cadastrar")}>
-          <Ionicons name="add-circle-outline" size={26} color="#555" />
-        </TouchableOpacity>
-
-
-        <TouchableOpacity onPress={() => router.push("/orcamentos")}>
-          <Feather name="dollar-sign" size={22} color="#555" />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.push("/alertas")}>
-          <Ionicons name="warning-outline" size={24} color="#555" />
-        </TouchableOpacity>
-
-      </View>
       <Footer active='inicial' /> 
     </View>
   );
@@ -172,8 +152,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    marginBottom: 80,
     paddingHorizontal: 15,
+    paddingBottom:140
   },
 
   card: {

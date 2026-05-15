@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    paddingBottom: 100,
+    paddingBottom: 190,
   },
 
   card: {
@@ -176,13 +176,12 @@ const styles = StyleSheet.create({
 
   fixedButtonContainer: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 120,
     left: 0,
     right: 0,
-    padding: 16,
-    backgroundColor: '#121212',
-    borderTopWidth: 1,
-    borderTopColor: '#222',
+    paddingHorizontal: 16,
+    paddingTop:10,
+    backgroundColor: 'transparent',
   },
 
   buttonText: {

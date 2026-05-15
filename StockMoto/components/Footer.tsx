@@ -1,6 +1,7 @@
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Props = {
   active?: "estoque" | "cadastrar" | "inicial" | "orcamentos" | "alertas";
@@ -18,10 +19,15 @@ export default function Footer({ active }: Props) {
     const isActive = active === name;
 
     return (
-      <TouchableOpacity onPress={() => router.replace(route)}>
+      <TouchableOpacity 
+        onPress={() => router.replace(route)}
+        activeOpacity={0.7}
+      >
         <View style={styles.tabContainer}>
+
+          {isActive && <View style={styles.activeCircle} />}
           
-          <View style={isActive ? styles.activeTab : undefined}>
+          <View style={styles.iconContainer}>
             {icon(isActive)}
           </View>
 
@@ -35,6 +41,7 @@ export default function Footer({ active }: Props) {
   };
 
   return (
+    <SafeAreaView style={styles.wrapper} edges={["bottom"]}>
     <View style={styles.footer}>
       
       {renderIcon(
@@ -43,8 +50,8 @@ export default function Footer({ active }: Props) {
         (isActive) => (
           <MaterialIcons
             name="inventory"
-            size={28}
-            color={isActive ? "#F47B20" : "#555"}
+            size={24}
+            color={isActive ? "#F47B20" : "#777"}
           />
         ),
         "/estoque"
@@ -56,8 +63,8 @@ export default function Footer({ active }: Props) {
         (isActive) => (
           <Ionicons
             name="add-circle-outline"
-            size={28}
-            color={isActive ? "#F47B20" : "#555"}
+            size={24}
+            color={isActive ? "#F47B20" : "#777"}
           />
         ),
         "/cadastrar"
@@ -69,8 +76,8 @@ export default function Footer({ active }: Props) {
         (isActive) => (
           <Ionicons
             name="grid"
-            size={28}
-            color={isActive ? "#F47B20" : "#555"}
+            size={24}
+            color={isActive ? "#F47B20" : "#777"}
           />
         ),
         "/inicial"
@@ -82,8 +89,8 @@ export default function Footer({ active }: Props) {
         (isActive) => (
           <Feather
             name="dollar-sign"
-            size={28}
-            color={isActive ? "#F47B20" : "#555"}
+            size={24}
+            color={isActive ? "#F47B20" : "#777"}
           />
         ),
         "/orcamentos"
@@ -95,49 +102,70 @@ export default function Footer({ active }: Props) {
         (isActive) => (
           <Ionicons
             name="warning-outline"
-            size={28}
-            color={isActive ? "#F47B20" : "#555"}
+            size={24}
+            color={isActive ? "#F47B20" : "#777"}
           />
         ),
         "/alertas"
       )}
 
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  footer: {
+  wrapper: {
     position: "absolute",
-    bottom: 0,
-    left: 1,
-    right: 0,
-    height: 80,
+    bottom: 40,
+    width: "100%",
+    alignItems: "center",
+    zIndex:999
+  },
+
+  footer: {
+    width: "98%",
+    height: 65,
     backgroundColor: "#fff",
+    borderRadius: 28,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 10,
   },
 
   tabContainer: {
     alignItems: "center",
     justifyContent: "center",
+    position: "relative",
+    width: 70,
   },
 
-  activeTab: {
-    backgroundColor: "#fff3e9",
-    padding: 0,
-    borderRadius: 12,
+  iconContainer: {zIndex: 2
   },
+  activeCircle: {
+    position: "absolute",
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+     backgroundColor: "#FFF3E9",
+     top: -5
+   },
 
   label: {
-    fontSize: 10,
-    color: "#555",
-    marginTop: 2,
+    fontSize: 9,
+    color: "#777",
+    marginTop: 10,
   },
 
   activeLabel: {
     color: "#F47B20",
     fontWeight: "bold",
+    
   },
 });
