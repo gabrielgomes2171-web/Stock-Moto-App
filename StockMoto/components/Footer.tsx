@@ -117,7 +117,7 @@ export default function Footer({ active }: Props) {
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    bottom: 40,
+    bottom: 30,
     width: "100%",
     alignItems: "center",
     zIndex:999
@@ -150,7 +150,6 @@ const styles = StyleSheet.create({
   },
   activeCircle: {
     position: "absolute",
-    width: 46,
     height: 46,
     borderRadius: 23,
      backgroundColor: "#FFF3E9",
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 9,
     color: "#777",
-    marginTop: 10,
+    marginTop: 5,
   },
 
   activeLabel: {

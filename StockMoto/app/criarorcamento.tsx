@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
 
   button: {
     backgroundColor: "#F57C00",
-    padding: 15,
+    padding: 14,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
@@ -176,11 +176,11 @@ const styles = StyleSheet.create({
 
   fixedButtonContainer: {
     position: 'absolute',
-    bottom: 120,
+    bottom: 110,
     left: 0,
     right: 0,
     paddingHorizontal: 16,
-    paddingTop:10,
+    padding: 1,
     backgroundColor: 'transparent',
   },
 
