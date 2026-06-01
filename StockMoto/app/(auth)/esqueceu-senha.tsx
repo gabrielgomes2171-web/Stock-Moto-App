@@ -136,9 +136,9 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 450,
-    height: 200,
-    marginBottom: 20,
+    width: 400,
+    height: 300,
+    marginBottom: 0,
   },
 
   title: {
