@@ -1,104 +1,50 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRef, useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+
 import { useRouter } from 'expo-router';
 
+import { Ionicons } from '@expo/vector-icons';
+
 export default function VerificarEmail() {
-
-  const [code, setCode] = useState(['', '', '', '']);
-  const [timer, setTimer] = useState(60);
   const router = useRouter();
-
-  const inputs = [
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-    useRef<TextInput>(null),
-  ];
-
-  useEffect(() => {
-    if (timer === 0) return;
-
-    const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timer]);
-
-  useEffect(() => {
-    if (code.every((digit) => digit !== '')) {
-      const finalCode = code.join('');
-      console.log('Código:', finalCode);
-
-      alert('Código completo: ' + finalCode);
-    }
-  }, [code]);
-
-  const handleChange = (text: string, index: number) => {
-    const newCode = [...code];
-    newCode[index] = text;
-    setCode(newCode);
-
-    if (text && index < 3) {
-      inputs[index + 1].current?.focus();
-    }
-  };
-
-  const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === 'Backspace' && code[index] === '' && index > 0) {
-      inputs[index - 1].current?.focus();
-    }
-  };
-
-  const handleResend = () => {
-    if (timer > 0) return;
-
-    setTimer(60);
-    alert('Código reenviado!');
-  };
 
   return (
     <View style={styles.container}>
+      <Ionicons
+        name="mail-outline"
+        size={80}
+        color="#F28C28"
+      />
 
-      <Text style={styles.title}>VERIFIQUE SEU</Text>
-      <Text style={styles.title}>E-MAIL</Text>
-
-      <Text style={styles.subtitle}>Enviamos um código de 4 dígitos para seuemail@exemplo.com.</Text>
-
-      <View style={styles.codeContainer}>
-        {code.map((digit, index) => (
-          <TextInput
-            key={index}
-            ref={inputs[index]}
-            style={styles.input}
-            maxLength={1}
-            keyboardType="numeric"
-            value={digit}
-            onChangeText={(text) => handleChange(text, index)}
-            onKeyPress={(e) => handleKeyPress(e, index)}
-          />
-        ))}
-      </View>
-
-      <TouchableOpacity style={styles.button}
-      onPress={() => router.push('/redefinir-senha')}
-      >
-        <Text style={styles.buttonText}>VERIFICAR CÓDIGO</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.resend}>
-        Não recebeu o código?{" "}
-        <Text
-          style={[
-            styles.resendHighlight,
-            timer > 0 && { opacity: 0.5 }
-          ]}
-          onPress={handleResend}
-        >
-          {timer > 0 ? `REENVIAR (${timer}s)` : 'REENVIAR'}
-        </Text>
+      <Text style={styles.title}>
+        VERIFIQUE SEU{'\n'}E-MAIL
       </Text>
 
+      <Text style={styles.subtitle}>
+        Enviamos um link de redefinição para seu e-mail.
+        Abra sua caixa de entrada e siga as instruções para criar uma nova senha.
+      </Text>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.replace('/login')}
+      >
+        <Text style={styles.buttonText}>
+          VOLTAR PARA LOGIN
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => router.push('/esqueceu-senha')}
+      >
+        <Text style={styles.resend}>
+          Enviar novamente
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -116,32 +62,17 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 35,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    textAlign: 'center',
+    marginTop: 20,
   },
 
   subtitle: {
     color: '#A1A1AA',
     textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 30,
+    marginTop: 14,
+    marginBottom: 35,
     fontSize: 15,
-  },
-
-  codeContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 50,
-  },
-
-  input: {
-    width: 55,
-    height: 65,
-    backgroundColor: '#2A2A2A',
-    borderRadius: 10,
-    textAlign: 'center',
-    color: '#FFF',
-    fontSize: 22,
-    fontWeight: 'bold',
+    lineHeight: 22,
   },
 
   button: {
@@ -149,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F28C28',
     paddingVertical: 16,
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 18,
   },
 
   buttonText: {
@@ -157,16 +88,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 14,
-    letterSpacing: 1,
   },
 
   resend: {
-    color: '#A1A1AA',
-    fontSize: 12,
-  },
-
-  resendHighlight: {
     color: '#F28C28',
+    fontSize: 13,
     fontWeight: 'bold',
   },
 });
