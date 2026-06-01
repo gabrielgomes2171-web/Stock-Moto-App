@@ -1,72 +1,42 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+
 import { useRouter } from 'expo-router';
+
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RedefinirSenha() {
-  const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>REDEFINIR{'\n'}SENHA</Text>
+      <Ionicons
+        name="mail-outline"
+        size={72}
+        color="#FF7A00"
+        style={styles.icon}
+      />
 
-      <Text style={styles.subtitle}>
-        Sua nova senha deve ser diferente da anterior. Verifique se os requisitos
-        de segurança estão visíveis.
+      <Text style={styles.title}>
+        REDEFINIR{'\n'}SENHA
       </Text>
 
-      <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="#0D0D0D" />
+      <Text style={styles.subtitle}>
+        Enviamos um link para redefinir sua senha.
+        Abra seu e-mail cadastrado e siga as instruções.
+      </Text>
 
-      <TextInput
-          placeholder="Nova senha"
-          placeholderTextColor="#999"
-          secureTextEntry={!showPassword}
-          style={styles.input}
-          value={senha}
-          onChangeText={setSenha}
-        />
-
-      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Ionicons
-          name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-          size={20}
-          color="#0D0D0D"
-          />
-          </TouchableOpacity>
-          </View>
-
-        <View style={styles.inputContainer}>
-          <Ionicons name="lock-open-outline" size={20} color="#0D0D0D" />
-
-      <TextInput
-          placeholder="Confirmar senha"
-          placeholderTextColor="#999"
-          secureTextEntry={!showConfirmPassword}
-          style={styles.input}
-          value={confirmarSenha}
-          onChangeText={setConfirmarSenha}
-        />
-
-      <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-          <Ionicons
-          name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
-          size={20}
-          color="#0D0D0D"
-      />
-    </TouchableOpacity>
-  </View>
-
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>REDEFINIR SENHA</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => router.push('/login')}>
-        <Text style={styles.login}>Voltar para o Login</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => router.replace('/login')}
+      >
+        <Text style={styles.buttonText}>
+          VOLTAR PARA LOGIN
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -77,7 +47,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#101010',
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 24,
+  },
+
+  icon: {
+    marginBottom: 18,
   },
 
   title: {
@@ -92,43 +67,21 @@ const styles = StyleSheet.create({
     color: '#AAA',
     fontSize: 15,
     textAlign: 'center',
-    marginBottom: 30,  
+    lineHeight: 23,
+    marginBottom: 30,
   },
 
-  inputContainer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  backgroundColor: '#E5E5E5',
-  borderRadius: 8,
-  paddingHorizontal: 12,
-  marginBottom: 12,
+  button: {
+    backgroundColor: '#FF7A00',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
   },
-
-input: {
-  flex: 1,
-  backgroundColor: '#E5E5E5',
-  color: '#0D0D0D',
-  borderRadius: 8,
-  paddingVertical: 14,
-  marginLeft: 10,
-},
-
-button: {
-  backgroundColor: '#FF7A00',
-  padding: 14,
-  borderRadius: 10,
-  alignItems: 'center',
-  marginTop: 20,
-},
 
   buttonText: {
     color: '#FFF',
     fontWeight: 'bold',
-  },
-
-  login: {
-    color: '#4DA6FF',
-    textAlign: 'center',
-    marginTop: 16,
   },
 });
