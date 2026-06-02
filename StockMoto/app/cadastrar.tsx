@@ -179,7 +179,7 @@ export default function Cadastrar() {
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={modeloMoto}
-            onValueChange={(itemValue) =>
+            onValueChange={(itemValue: string) =>
               setModeloMoto(itemValue)
             }
             dropdownIconColor="#fff"
