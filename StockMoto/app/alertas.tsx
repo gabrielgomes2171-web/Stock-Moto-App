@@ -1,121 +1,183 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+} from 'react-native';
+
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
-type ItemProps= {
-    nome: string;
-    codigo: string;
-    categoria: string;
-    quantidade: number;
-    minimo: number;
-    imagem: any;
-};
+import React, {
+  useCallback,
+  useState,
+} from 'react';
 
-function ItemAlerta({
-    nome,
-    codigo,
-    categoria,
-    quantidade,
-    minimo,
-    imagem,
-}: ItemProps) {
-    const isEsgotado = quantidade === 0;
+import { useFocusEffect } from 'expo-router';
 
-    return (
-        <View style={styles.item}>
-            <View style={styles.left}>
-                <Image source={imagem} style={styles.img} />
+import {
+  listarAlertasFirebase,
+} from '../firebase/produtosFirebase';
 
-                <View>
-                    <Text style={styles.nome}>{nome}</Text>
+function ItemAlerta({ item }: any) {
+  const esgotado =
+    Number(item.quantidade || 0) === 0;
 
-                    <View style={styles.row}>
-                        <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{categoria}</Text>
-                        </View>
+  const imagemProduto =
+    item.imagem
+      ? { uri: item.imagem }
+      : require('../assets/images/velas.png');
 
-                        <Text style={styles.codigo}>{codigo}</Text>
-                    </View>
-                </View>
+  return (
+    <View style={styles.item}>
+      <View style={styles.left}>
+        <Image
+          source={imagemProduto}
+          style={styles.img}
+        />
+
+        <View style={{ flex: 1 }}>
+          <Text style={styles.nome}>
+            {item.nome}
+          </Text>
+
+          <View style={styles.row}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {item.categoria || 'PEÇA'}
+              </Text>
             </View>
 
-            <View style={styles.right}>
-                <Text
-                    style={[
-                        styles.qtd,
-                        { color: isEsgotado ? '#FF3B3B' : '#FF3B3B'},
-                    ]}
-                >
-                    {quantidade} Uni.
-                </Text>
+            <Text style={styles.codigo}>
+              {item.codigo}
+            </Text>
+          </View>
 
-                <Text style={styles.min}>min: {minimo}</Text>
-            </View>
+          <Text style={styles.moto}>
+            {item.modelo_moto}
+          </Text>
         </View>
-    );
+      </View>
+
+      <View style={styles.right}>
+        <Text
+          style={[
+            styles.qtd,
+            {
+              color: esgotado
+                ? '#FF3B3B'
+                : '#FFC107',
+            },
+          ]}
+        >
+          {item.quantidade} Uni.
+        </Text>
+
+        <Text style={styles.min}>
+          min: {item.estoque_minimo}
+        </Text>
+      </View>
+    </View>
+  );
 }
 
 export default function Alertas() {
-    return (
-        <View style={styles.container}>
-            <Header title='Alertas' showSettings/>
+  const [alertas, setAlertas] =
+    useState<any[]>([]);
 
-            <View style={styles.content}>
-                <Text style={styles.titulo}>Alerta de Estoque</Text>
-                <Text style={styles.subtitulo}>
-                    Peças que precisam de Atenção
-                </Text>   
+  useFocusEffect(
+    useCallback(() => {
+      carregarAlertas();
+    }, [])
+  );
 
-                <Text style={styles.esgotado}>❗ Esgotados (1)</Text>
+  async function carregarAlertas() {
+    const lista =
+      await listarAlertasFirebase();
 
-                <ItemAlerta
-                    nome='Vela de Ignição'
-                    codigo='#VL - 001'
-                    categoria='ELÉTRICA'
-                    quantidade={0}
-                    minimo={10}
-                    imagem={require('../assets/images/velas.png')}
-                />
+    setAlertas(lista as any[]);
+  }
 
-                <Text style={styles.baixo}>⚠️ Estoque Baixo (3)</Text>
-
-                <ItemAlerta
-                    nome="Filtro Ar"
-                    codigo="#FA - 001"
-                    categoria="FILTRO"
-                    quantidade={2}
-                    minimo={5}
-                    imagem={require("../assets/images/filtroar.png")}
-                />
-
-                <ItemAlerta
-                   nome="Cdi Eletrônico"
-                    codigo="#EL - 001"
-                    categoria="ELÉTRICA"
-                    quantidade={1}
-                    minimo={3}
-                    imagem={require("../assets/images/cdieletronico.png")}
-                />
-
-                <ItemAlerta
-                    nome="Pneu Pirelli CG 160 (TR)"
-                    codigo="#PN - 005"
-                    categoria="PNEU"
-                    quantidade={10}
-                    minimo={20}
-                    imagem={require("../assets/images/pneupirelli.png")}
-                />
-            </View>
-
-            <Footer active='alertas' />
-        </View>
+  const esgotados =
+    alertas.filter(
+      (item: any) =>
+        Number(item.quantidade || 0) === 0
     );
+
+  const estoqueBaixo =
+    alertas.filter(
+      (item: any) =>
+        Number(item.quantidade || 0) > 0
+    );
+
+  return (
+    <View style={styles.container}>
+      <Header title="Alertas" showSettings />
+
+      <View style={styles.content}>
+        <Text style={styles.titulo}>
+          Alerta de Estoque
+        </Text>
+
+        <Text style={styles.subtitulo}>
+          Peças que precisam de atenção
+        </Text>
+
+        {alertas.length === 0 ? (
+          <Text style={styles.vazio}>
+            Nenhum alerta encontrado
+          </Text>
+        ) : (
+          <FlatList
+            data={[
+              {
+                tipo: 'titulo',
+                titulo: `❗ Esgotados (${esgotados.length})`,
+                cor: '#ff3b3b',
+              },
+              ...esgotados,
+              {
+                tipo: 'titulo',
+                titulo: `⚠️ Estoque Baixo (${estoqueBaixo.length})`,
+                cor: '#ffc107',
+              },
+              ...estoqueBaixo,
+            ]}
+            keyExtractor={(item: any, index) =>
+              item.id
+                ? item.id.toString()
+                : `titulo-${index}`
+            }
+            renderItem={({ item }: any) => {
+              if (item.tipo === 'titulo') {
+                return (
+                  <Text
+                    style={[
+                      styles.sectionLabel,
+                      { color: item.cor },
+                    ]}
+                  >
+                    {item.titulo}
+                  </Text>
+                );
+              }
+
+              return <ItemAlerta item={item} />;
+            }}
+          />
+        )}
+      </View>
+
+      <Footer active="alertas" />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#101010",
+    backgroundColor: '#101010',
   },
 
   content: {
@@ -125,94 +187,101 @@ const styles = StyleSheet.create({
   },
 
   titulo: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 
   subtitulo: {
-    color: "#aaa",
+    color: '#aaa',
     fontSize: 13,
     marginBottom: 15,
   },
 
-  esgotado: {
-    color: "#ff3b3b",
-    fontWeight: "bold",
-    marginBottom: 10,
+  vazio: {
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 20,
   },
 
-  baixo: {
-    color: "#ffc107",
-    fontWeight: "bold",
-    marginTop: 15,
+  sectionLabel: {
+    fontWeight: 'bold',
+    marginTop: 12,
     marginBottom: 10,
   },
 
   item: {
-    backgroundColor: "#2b2b2b",
+    backgroundColor: '#2b2b2b',
     borderRadius: 12,
     padding: 12,
     marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   left: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
+    flex: 1,
   },
 
   img: {
     width: 40,
     height: 40,
     borderRadius: 6,
-    backgroundColor: "#444",
+    backgroundColor: '#444',
   },
 
   nome: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
   },
 
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
     marginTop: 3,
   },
 
   badge: {
-    backgroundColor: "#ff8c00",
+    backgroundColor: '#ff8c00',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
   },
 
   badgeText: {
-    color: "#000",
+    color: '#000',
     fontSize: 10,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 
   codigo: {
-    color: "#bbb",
+    color: '#bbb',
     fontSize: 12,
   },
 
+  moto: {
+    color: '#999',
+    fontSize: 11,
+    marginTop: 3,
+  },
+
   right: {
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
+    marginLeft: 8,
   },
 
   qtd: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     fontSize: 14,
   },
 
   min: {
-    color: "#bbb",
+    color: '#bbb',
     fontSize: 11,
   },
 });
