@@ -1,32 +1,99 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Alert,
+} from "react-native";
+
+import React, { useCallback, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const pecas = [
-  {
-    nome: "Óleo Motul 10W30",
-    valor: "R$ 60,00",
-    estoque: "10 Un",
-    status: "OK",
-  },
-  {
-    nome: "Guidão Com Peso",
-    valor: "R$ 45,00",
-    estoque: "8 Un",
-    status: "OK",
-  },
-  {
-    nome: "Kit Relação e Transmissão",
-    valor: "R$ 90,00",
-    estoque: "5 Un",
-    status: "OK",
-  },
-];
+import {
+  listarProdutosPorModeloFirebase,
+  adicionarQuantidadeFirebase,
+  removerQuantidadeFirebase,
+} from "../firebase/produtosFirebase";
+
+const MODELO_MOTO = "CG 160 CARGO";
 
 export default function EstoqueCargo160() {
   const router = useRouter();
+
+  const [pecas, setPecas] = useState<any[]>([]);
+  const [busca, setBusca] = useState("");
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarPecas();
+    }, [])
+  );
+
+  async function carregarPecas() {
+    const dados = await listarProdutosPorModeloFirebase(MODELO_MOTO);
+    setPecas(dados as any[]);
+  }
+
+  async function aumentar(id: string, nome: string) {
+    Alert.alert("Adicionar peça", `Deseja adicionar 1 unidade de ${nome}?`, [
+      { text: "Não", style: "cancel" },
+      {
+        text: "Sim",
+        onPress: async () => {
+          await adicionarQuantidadeFirebase(id);
+          carregarPecas();
+        },
+      },
+    ]);
+  }
+
+  async function diminuir(id: string, quantidade: number, nome: string) {
+    if (quantidade <= 0) {
+      Alert.alert("Erro", "Estoque já está zerado");
+      return;
+    }
+
+    Alert.alert("Remover peça", `Deseja remover 1 unidade de ${nome}?`, [
+      { text: "Não", style: "cancel" },
+      {
+        text: "Sim",
+        onPress: async () => {
+          await removerQuantidadeFirebase(id, quantidade);
+          carregarPecas();
+        },
+      },
+    ]);
+  }
+
+  const pecasFiltradas = pecas.filter(
+    (item: any) =>
+      item.nome?.toLowerCase().includes(busca.toLowerCase()) ||
+      item.codigo?.toLowerCase().includes(busca.toLowerCase())
+  );
+
+  const totalTipos = pecas.length;
+
+  const totalUnidades = pecas.reduce(
+    (total: number, item: any) => total + Number(item.quantidade || 0),
+    0
+  );
+
+  const totalValor = pecas.reduce(
+    (total: number, item: any) =>
+      total + Number(item.preco_venda || 0) * Number(item.quantidade || 0),
+    0
+  );
+
+  const totalAlertas = pecas.filter(
+    (item: any) => Number(item.quantidade || 0) <= Number(item.estoque_minimo || 0)
+  ).length;
 
   return (
     <View style={styles.container}>
@@ -36,7 +103,6 @@ export default function EstoqueCargo160() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.push("/estoquehonda")}
@@ -45,107 +111,126 @@ export default function EstoqueCargo160() {
         </TouchableOpacity>
 
         <View style={styles.heroCard}>
-
           <Image
             source={require("@/assets/images/honda.png")}
             style={styles.logo}
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>CG 160 CARGO</Text>
+          <Text style={styles.title}>{MODELO_MOTO}</Text>
 
-          <Text style={styles.subtitle}>
-            Modelos 2016 - 2026
-          </Text>
-
+          <Text style={styles.subtitle}>Modelos 2016 - 2026</Text>
         </View>
 
         <View style={styles.statsContainer}>
-
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>3</Text>
+            <Text style={styles.statNumber}>{totalTipos}</Text>
             <Text style={styles.statLabel}>Tipos</Text>
           </View>
 
           <View style={styles.statCard}>
-            <Text style={styles.statNumber}>23</Text>
+            <Text style={styles.statNumber}>{totalUnidades}</Text>
             <Text style={styles.statLabel}>Unidades</Text>
           </View>
 
           <View style={styles.alertCard}>
-            <Text style={styles.alertNumber}>0</Text>
+            <Text style={styles.alertNumber}>{totalAlertas}</Text>
             <Text style={styles.statLabel}>Alertas</Text>
           </View>
-
         </View>
 
         <View style={styles.moneyCard}>
           <Text style={styles.moneyTitle}>Valor Total em Estoque</Text>
 
           <Text style={styles.moneyValue}>
-            R$ 1.410,00
+            R$ {totalValor.toFixed(2)}
           </Text>
         </View>
 
         <View style={styles.searchBox}>
-
-          <Ionicons
-            name="search"
-            size={18}
-            color="#888"
-          />
+          <Ionicons name="search" size={18} color="#888" />
 
           <TextInput
             placeholder="Buscar peça"
             placeholderTextColor="#888"
             style={styles.input}
+            value={busca}
+            onChangeText={setBusca}
           />
-
         </View>
 
-        <Text style={styles.sectionTitle}>
-          Peças em Estoque
-        </Text>
+        <Text style={styles.sectionTitle}>Peças em Estoque</Text>
 
-        {pecas.map((item, index) => (
+        {pecasFiltradas.length === 0 ? (
+          <Text style={styles.emptyText}>Nenhuma peça cadastrada</Text>
+        ) : (
+          pecasFiltradas.map((item: any) => {
+            const baixo =
+              Number(item.quantidade || 0) <= Number(item.estoque_minimo || 0);
 
-          <View style={styles.itemCard} key={index}>
+            return (
+              <View style={styles.itemCard} key={item.id}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.itemName}>{item.nome}</Text>
 
-            <View>
-              <Text style={styles.itemName}>
-                {item.nome}
-              </Text>
+                  <Text style={styles.itemInfo}>Código: {item.codigo}</Text>
 
-              <Text style={styles.itemPrice}>
-                {item.valor}
-              </Text>
-            </View>
+                  <Text style={styles.itemInfo}>Marca: {item.marca}</Text>
 
-            <View style={styles.rightContent}>
+                  <Text style={styles.itemPrice}>
+                    R$ {Number(item.preco_venda || 0).toFixed(2)}
+                  </Text>
 
-              <Text style={styles.stockText}>
-                {item.estoque}
-              </Text>
+                  {baixo && (
+                    <Text style={styles.alertText}>⚠ ESTOQUE BAIXO</Text>
+                  )}
+                </View>
 
-              <View
-                style={[
-                  styles.statusBadge,
-                  item.status === "OK"
-                    ? styles.statusOk
-                    : styles.statusLow,
-                ]}
-              >
-                <Text style={styles.statusText}>
-                  {item.status}
-                </Text>
+                <View style={styles.rightContent}>
+                  <Text
+                    style={[
+                      styles.stockNumber,
+                      baixo && styles.stockLow,
+                    ]}
+                  >
+                    {item.quantidade}
+                  </Text>
+
+                  <Text style={styles.stockLabel}>un.</Text>
+
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      baixo ? styles.statusLow : styles.statusOk,
+                    ]}
+                  >
+                    <Text style={styles.statusText}>
+                      {baixo ? "BAIXO" : "OK"}
+                    </Text>
+                  </View>
+
+                  <View style={styles.buttonsRow}>
+                    <TouchableOpacity
+                      style={styles.minusButton}
+                      onPress={() =>
+                        diminuir(item.id, item.quantidade, item.nome)
+                      }
+                    >
+                      <Text style={styles.buttonText}>-</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.plusButton}
+                      onPress={() => aumentar(item.id, item.nome)}
+                    >
+                      <Text style={styles.buttonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-
-            </View>
-
-          </View>
-
-        ))}
-
+            );
+          })
+        )}
       </ScrollView>
 
       <Footer active="estoque" />
@@ -282,6 +367,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
+  emptyText: {
+    color: "#999",
+    textAlign: "center",
+    marginTop: 20,
+  },
+
   itemCard: {
     backgroundColor: "#2A2A2A",
     borderRadius: 16,
@@ -298,19 +389,43 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 
+  itemInfo: {
+    color: "#AAA",
+    marginTop: 3,
+    fontSize: 12,
+  },
+
   itemPrice: {
     color: "#AAA",
     marginTop: 3,
     fontSize: 12,
   },
 
-  rightContent: {
-    alignItems: "flex-end",
+  alertText: {
+    color: "#FF3B30",
+    marginTop: 6,
+    fontWeight: "700",
+    fontSize: 12,
   },
 
-  stockText: {
+  rightContent: {
+    alignItems: "flex-end",
+    marginLeft: 10,
+  },
+
+  stockNumber: {
     color: "#FFF",
+    fontSize: 22,
     fontWeight: "700",
+  },
+
+  stockLow: {
+    color: "#FF3B30",
+  },
+
+  stockLabel: {
+    color: "#AAA",
+    fontSize: 12,
     marginBottom: 5,
   },
 
@@ -318,6 +433,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 4,
+    marginBottom: 8,
   },
 
   statusOk: {
@@ -331,6 +447,36 @@ const styles = StyleSheet.create({
   statusText: {
     color: "#FFF",
     fontSize: 11,
+    fontWeight: "700",
+  },
+
+  buttonsRow: {
+    flexDirection: "row",
+    marginTop: 4,
+  },
+
+  minusButton: {
+    backgroundColor: "#FF3B30",
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 6,
+  },
+
+  plusButton: {
+    backgroundColor: "#00C853",
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  buttonText: {
+    color: "#FFF",
+    fontSize: 20,
     fontWeight: "700",
   },
 });
