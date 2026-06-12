@@ -113,6 +113,8 @@ F --> G
 * React Native
 * Firebase
 * Figma (UI/UX)
+* API (NoSQL)
+* Spring Boot
 
 ---
 
