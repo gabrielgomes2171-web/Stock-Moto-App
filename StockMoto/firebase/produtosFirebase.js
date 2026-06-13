@@ -63,7 +63,7 @@ export async function listarProdutosPorModeloFirebase(modeloMoto) {
   }));
 }
 
-export async function listarAlertasFirebase() {
+export async function listarAlertasFirebase(configuracoes) {
   const usuario = auth.currentUser;
 
   if (!usuario) {
@@ -71,8 +71,8 @@ export async function listarAlertasFirebase() {
   }
 
   const q = query(
-    collection(dbFirebase, 'produtos'),
-    where('usuario_id', '==', usuario.uid)
+    collection(dbFirebase, "produtos"),
+    where("usuario_id", "==", usuario.uid)
   );
 
   const snapshot = await getDocs(q);
@@ -82,16 +82,32 @@ export async function listarAlertasFirebase() {
     ...documento.data(),
   }));
 
-  return produtos
-    .filter((produto) =>
-      Number(produto.quantidade || 0) <=
-      Number(produto.estoque_minimo || 0)
-    )
-    .sort(
-      (a, b) =>
-        Number(a.quantidade || 0) -
-        Number(b.quantidade || 0)
-    );
+  let alertas = [];
+
+  produtos.forEach((produto) => {
+    const quantidade = Number(produto.quantidade || 0);
+    const minimo = Number(produto.estoque_minimo || 0);
+
+    if (configuracoes.zerado && quantidade === 0) {
+      alertas.push({
+        tipo: "zerado",
+        ...produto,
+      });
+    }
+
+    if (
+      configuracoes.minimo &&
+      quantidade > 0 &&
+      quantidade <= minimo
+    ) {
+      alertas.push({
+        tipo: "baixo",
+        ...produto,
+      });
+    }
+  });
+
+  return alertas;
 }
 
 export async function adicionarQuantidadeFirebase(produtoId) {

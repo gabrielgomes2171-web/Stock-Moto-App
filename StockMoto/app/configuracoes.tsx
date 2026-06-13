@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Switch, StatusBar } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -6,21 +6,60 @@ import { TouchableOpacity } from "react-native";
 import Footer from "../components/Footer";
 import { useUser } from "../contexts/UserContext";
 import { Image } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {  obterConfiguracoes, salvarConfiguracoes } from "../services/configuracoes";
 
 export default function Configuracoes() {
-  const [minimo, setMinimo] = useState(true);
-  const [zerado, setZerado] = useState(true);
-  const [orcamento, setOrcamento] = useState(false);
   const router = useRouter();
   const { nome, imagem } = useUser();
 
-  return (
-    
-    <View style={styles.container}>
+  const [minimo, setMinimo] = useState(true);
+  const [zerado, setZerado] = useState(true);
+  const [orcamento, setOrcamento] = useState(false);
 
+  useEffect(() => {
+    carregarConfiguracoes();
+  }, []);
+
+  const carregarConfiguracoes = async () => {
+    try {
+      const configSalva = await AsyncStorage.getItem("configuracoes");
+
+      if (configSalva) {
+        const dados = JSON.parse(configSalva);
+
+        setMinimo(dados.minimo ?? true);
+        setZerado(dados.zerado ?? true);
+        setOrcamento(dados.orcamento ?? false);
+      }
+    } catch (error) {
+      console.log("Erro ao carregar configurações:", error);
+    }
+  };
+
+  const salvarConfiguracoes = async (
+    novoMinimo: boolean,
+    novoZerado: boolean,
+    novoOrcamento: boolean,
+  ) => {
+    try {
+      await AsyncStorage.setItem(
+        "configuracoes",
+        JSON.stringify({
+          minimo: novoMinimo,
+          zerado: novoZerado,
+          orcamento: novoOrcamento,
+        })
+      );
+    } catch (error) {
+      console.log("Erro ao salvar configurações:", error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          
           <TouchableOpacity
             style={styles.profile}
             onPress={() => router.push("/perfil")}
@@ -28,19 +67,19 @@ export default function Configuracoes() {
             <View style={styles.avatar}>
               {imagem ? (
                 <Image source={{ uri: imagem }} style={styles.avatarImage} />
-                 ) : (
-                  <Text style={styles.avatarText}>
-                    {nome ? nome.charAt(0) : "M"}
-                  </Text>
-                  )}
+              ) : (
+                <Text style={styles.avatarText}>
+                  {nome ? nome.charAt(0) : "M"}
+                </Text>
+              )}
             </View>
-            <Text style={styles.brand}>{nome}</Text>
+
+            <Text style={styles.brand}>{nome || "Moto Stock"}</Text>
           </TouchableOpacity>
+        </View>
 
+        <Text style={styles.title}>Configurações</Text>
       </View>
-
-      <Text style={styles.title}>Configurações</Text>
-    </View>
 
       <Text style={styles.subtitle}>
         Personalize o sistema conforme a sua necessidade
@@ -48,55 +87,90 @@ export default function Configuracoes() {
 
       <View style={styles.card}>
         <View style={styles.cardHeader}>
-          <Ionicons name="notifications-outline" size={18} color="#FFA94D" />
+          <Ionicons
+            name="notifications-outline"
+            size={18}
+            color="#FFA94D"
+          />
           <Text style={styles.cardTitle}> Notificações e Alertas</Text>
         </View>
 
         <View style={styles.item}>
-          <View>
-            <Text style={styles.itemTitle}>Estoque mínimo atingido</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.itemTitle}>
+              Estoque mínimo atingido
+            </Text>
+
             <Text style={styles.itemDesc}>
               Alertar quando a quantidade estiver baixa
             </Text>
           </View>
+
           <Switch
             value={minimo}
-            onValueChange={setMinimo}
+            onValueChange={(valor) => {
+              setMinimo(valor);
+              salvarConfiguracoes(valor, zerado, orcamento);
+            }}
             thumbColor="#fff"
-            trackColor={{ false: "#555", true: "#FF8C00" }}
+            trackColor={{
+              false: "#555",
+              true: "#FF8C00",
+            }}
           />
         </View>
 
         <View style={styles.item}>
-          <View>
-            <Text style={styles.itemTitle}>Estoque Zerado</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.itemTitle}>
+              Estoque Zerado
+            </Text>
+
             <Text style={styles.itemDesc}>
               Alertar quando uma peça estiver esgotada
             </Text>
           </View>
+
           <Switch
             value={zerado}
-            onValueChange={setZerado}
+            onValueChange={(valor) => {
+              setZerado(valor);
+              salvarConfiguracoes(minimo, valor, orcamento);
+            }}
             thumbColor="#fff"
-            trackColor={{ false: "#555", true: "#FF8C00" }}
+            trackColor={{
+              false: "#555",
+              true: "#FF8C00",
+            }}
           />
         </View>
 
         <View style={styles.item}>
-          <View>
-            <Text style={styles.itemTitle}>Orçamentos Expirando</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.itemTitle}>
+              Orçamentos Expirando
+            </Text>
+
             <Text style={styles.itemDesc}>
               Alertar sobre orçamentos próximos do vencimento
             </Text>
           </View>
+
           <Switch
             value={orcamento}
-            onValueChange={setOrcamento}
+            onValueChange={(valor) => {
+              setOrcamento(valor);
+              salvarConfiguracoes(minimo, zerado, valor);
+            }}
             thumbColor="#fff"
-            trackColor={{ false: "#555", true: "#FF8C00" }}
+            trackColor={{
+              false: "#555",
+              true: "#FF8C00",
+            }}
           />
         </View>
       </View>
+
       <Footer />
     </View>
   );
@@ -195,6 +269,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginVertical: 10,
+  },
+
+  textContainer: {
+    flex: 1,
+    paddingRight: 10,
   },
 
   itemTitle: {
