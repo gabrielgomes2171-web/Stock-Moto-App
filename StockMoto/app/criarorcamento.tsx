@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
 
   fixedButtonContainer: {
     position: 'absolute',
-    bottom: 110,
+    bottom: 120,
     left: 0,
     right: 0,
     paddingHorizontal: 16,

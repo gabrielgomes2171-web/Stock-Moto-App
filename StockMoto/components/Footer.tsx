@@ -117,7 +117,7 @@ export default function Footer({ active }: Props) {
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    bottom: 30,
+    bottom: 5,
     width: "100%",
     alignItems: "center",
     zIndex:999
