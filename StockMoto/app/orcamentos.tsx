@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState, useCallback } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "expo-router/react-navigation";
 import { listarOrcamentosFirebase, excluirOrcamentoFirebase } from "../services/orcamentosFirebase";
 
 export default function Orcamentos() {
