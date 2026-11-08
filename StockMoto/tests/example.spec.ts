@@ -1,18 +1,50 @@
+
 import { test, expect } from '@playwright/test';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+// CT-01 - Impedir login com campos vazios
+test('CT-01 - Impede login com campos vazios', async ({ page }) => {
+  await page.goto('/');
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
+  // Verificar se os campos estão visíveis
+  await expect(page.getByPlaceholder('Email')).toBeVisible();
+  await expect(page.getByPlaceholder('Senha')).toBeVisible();
+
+  // Tentar entrar sem preencher os campos
+  await page.getByText('ENTRAR NA CONTA', { exact: true }).click();
+
+  // Confirmar que permanece na tela de login
+  await expect(page).toHaveURL(/login/);
 });
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+// CT-02 - Impedir login com credenciais inválidas
+test('CT-02 - Impede login com credenciais inválidas', async ({ page }) => {
+  // Simular resposta de credenciais inválidas do Firebase
+  await page.route('**/identitytoolkit.googleapis.com/**', async route => {
+    if (route.request().url().includes('signInWithPassword')) {
+      await route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          error: {
+            code: 400,
+            message: 'INVALID_LOGIN_CREDENTIALS',
+          },
+        }),
+      });
+    } else {
+      await route.continue();
+    }
+  });
 
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
+  await page.goto('/');
 
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  // Preencher credenciais inválidas
+  await page.getByPlaceholder('Email').fill('teste@stockmoto.com');
+  await page.getByPlaceholder('Senha').fill('senhaerrada123');
+
+  // Tentar entrar
+  await page.getByText('ENTRAR NA CONTA', { exact: true }).click();
+
+  // Confirmar que permanece na tela de login
+  await expect(page).toHaveURL(/login/, { timeout: 15000 });
 });

@@ -1,3 +1,4 @@
+
 import {
   collection,
   addDoc,
@@ -14,7 +15,21 @@ import {
   dbFirebase,
 } from './firebaseConfig';
 
+// =====================================================
+// CADASTRAR PRODUTO
+// =====================================================
+
 export async function cadastrarProdutoFirebase(produto) {
+  // Simulação exclusiva dos testes Playwright
+  if (globalThis.__STOCKMOTO_E2E__ === true) {
+    console.log('CADASTRO SIMULADO:', produto);
+
+    return {
+      id: 'produto-teste-stockmoto',
+      ...produto,
+    };
+  }
+
   const usuario = auth.currentUser;
 
   if (!usuario) {
@@ -42,7 +57,42 @@ export async function cadastrarProdutoFirebase(produto) {
   );
 }
 
+// =====================================================
+// LISTAR PRODUTOS POR MODELO
+// =====================================================
+
 export async function listarProdutosPorModeloFirebase(modeloMoto) {
+  // Simulação exclusiva dos testes Playwright
+  if (globalThis.__STOCKMOTO_E2E__ === true) {
+    if (modeloMoto === 'CG 160 FAN') {
+      return [
+        {
+          id: 'peca-teste-001',
+          nome: 'Pastilha de Freio',
+          codigo: 'PF-001',
+          marca: 'Honda',
+          modelo_moto: 'CG 160 FAN',
+          preco_venda: 25.90,
+          quantidade: 10,
+          estoque_minimo: 2,
+        },
+        {
+          id: 'peca-teste-002',
+          nome: 'Filtro de Óleo',
+          codigo: 'FO-002',
+          marca: 'Honda',
+          modelo_moto: 'CG 160 FAN',
+          preco_venda: 18.50,
+          quantidade: 5,
+          estoque_minimo: 2,
+        },
+      ];
+    }
+
+    return [];
+  }
+
+  // Consulta normal ao Firebase
   const usuario = auth.currentUser;
 
   if (!usuario) {
@@ -63,6 +113,10 @@ export async function listarProdutosPorModeloFirebase(modeloMoto) {
   }));
 }
 
+// =====================================================
+// LISTAR ALERTAS
+// =====================================================
+
 export async function listarAlertasFirebase(configuracoes) {
   const usuario = auth.currentUser;
 
@@ -71,8 +125,8 @@ export async function listarAlertasFirebase(configuracoes) {
   }
 
   const q = query(
-    collection(dbFirebase, "produtos"),
-    where("usuario_id", "==", usuario.uid)
+    collection(dbFirebase, 'produtos'),
+    where('usuario_id', '==', usuario.uid)
   );
 
   const snapshot = await getDocs(q);
@@ -90,7 +144,7 @@ export async function listarAlertasFirebase(configuracoes) {
 
     if (configuracoes.zerado && quantidade === 0) {
       alertas.push({
-        tipo: "zerado",
+        tipo: 'zerado',
         ...produto,
       });
     }
@@ -101,7 +155,7 @@ export async function listarAlertasFirebase(configuracoes) {
       quantidade <= minimo
     ) {
       alertas.push({
-        tipo: "baixo",
+        tipo: 'baixo',
         ...produto,
       });
     }
@@ -110,7 +164,17 @@ export async function listarAlertasFirebase(configuracoes) {
   return alertas;
 }
 
+// =====================================================
+// ADICIONAR QUANTIDADE
+// =====================================================
+
 export async function adicionarQuantidadeFirebase(produtoId) {
+  // Não altera o Firebase durante os testes
+  if (globalThis.__STOCKMOTO_E2E__ === true) {
+    console.log('ADIÇÃO SIMULADA:', produtoId);
+    return;
+  }
+
   const ref = doc(
     dbFirebase,
     'produtos',
@@ -122,11 +186,21 @@ export async function adicionarQuantidadeFirebase(produtoId) {
   });
 }
 
+// =====================================================
+// REMOVER QUANTIDADE
+// =====================================================
+
 export async function removerQuantidadeFirebase(
   produtoId,
   quantidadeAtual
 ) {
   if (quantidadeAtual <= 0) {
+    return;
+  }
+
+  // Não altera o Firebase durante os testes
+  if (globalThis.__STOCKMOTO_E2E__ === true) {
+    console.log('REMOÇÃO SIMULADA:', produtoId);
     return;
   }
 
