@@ -28,4 +28,31 @@ module.exports = defineConfig([
       ],
     },
   },
+  {
+    // Testes E2E devem usar o `test` de tests/support/fixtures.ts, que
+    // bloqueia a rede externa e mocka o Firebase Auth.
+    files: ['tests/**/*.ts'],
+    ignores: ['tests/support/fixtures.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            // Mantém também a restrição do Firebase Auth do bloco anterior
+            // (esta regra substitui a anterior para os arquivos de teste).
+            {
+              name: 'firebase/auth',
+              importNames: ['getAuth', 'initializeAuth', 'getReactNativePersistence'],
+              message: 'Use o `auth` exportado por firebase/firebaseConfig.js.',
+            },
+            {
+              name: '@playwright/test',
+              importNames: ['test'],
+              message: 'Importe `test` de ./support/fixtures (bloqueia a rede e mocka o Firebase).',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);

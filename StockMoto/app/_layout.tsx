@@ -15,13 +15,14 @@ import { UserProvider } from '../contexts/UserContext';
  * rotas não listadas ficam sem proteção.
  */
 function RootNavigator() {
-  const { usuario, carregando } = useAuth();
+  const { usuario, carregando, demorando } = useAuth();
 
-  // Não monta o Stack (nem redireciona) até saber se há sessão salva.
-  // Assim um acesso direto/recarregamento de rota interna não cai no
-  // login por engano enquanto a sessão é restaurada.
+  // Não monta o Stack (nem redireciona) até o Firebase confirmar se há
+  // sessão. Assim nenhuma rota interna é exibida sem sessão confirmada, e
+  // um acesso direto/recarregamento não cai no login por engano: quando o
+  // Stack monta, a URL original ainda é a rota inicial.
   if (carregando) {
-    return <TelaCarregando />;
+    return <TelaCarregando demorando={demorando} />;
   }
 
   const autenticado = usuario !== null;
