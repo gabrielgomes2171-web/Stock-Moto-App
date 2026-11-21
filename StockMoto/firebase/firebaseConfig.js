@@ -1,8 +1,8 @@
-import { initializeApp } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 
 import { getFirestore } from 'firebase/firestore';
 
-import { getAuth } from 'firebase/auth';
+import { criarAuth } from './authInstance';
 
 const firebaseConfig = {
 
@@ -20,10 +20,14 @@ const firebaseConfig = {
 
 };
 
-const app = initializeApp(firebaseConfig);
+// Evita inicializar o app duas vezes (ex.: Fast Refresh).
+const app = getApps().length
+  ? getApp()
+  : initializeApp(firebaseConfig);
 
 export const dbFirebase =
   getFirestore(app);
 
+// Persistência por plataforma: ver authInstance.ts / authInstance.native.ts
 export const auth =
-  getAuth(app);
+  criarAuth(app);
