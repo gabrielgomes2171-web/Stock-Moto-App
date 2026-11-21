@@ -41,17 +41,11 @@ export default function Login() {
     }
 
     try {
-      const usuarioEncontrado =
-        await loginFirebase(
-          emailLimpo,
-          senhaLimpa
-        );
-
-      (globalThis as any).usuarioLogado = {
-        id: usuarioEncontrado.uid,
-        uid: usuarioEncontrado.uid,
-        email: usuarioEncontrado.email,
-      };
+      // O usuário autenticado passa a ser lido do AuthContext (useAuth).
+      await loginFirebase(
+        emailLimpo,
+        senhaLimpa
+      );
 
       Alert.alert(
         'Sucesso',
