@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Switch, StatusBar } from "react-native";
+import { View, Text, StyleSheet, Switch, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { TouchableOpacity } from "react-native";
 import Footer from "../components/Footer";
 import { useUser } from "../contexts/UserContext";
-import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {  obterConfiguracoes, salvarConfiguracoes } from "../services/configuracoes";
 
 export default function Configuracoes() {
   const router = useRouter();
@@ -18,24 +15,24 @@ export default function Configuracoes() {
   const [orcamento, setOrcamento] = useState(false);
 
   useEffect(() => {
+    const carregarConfiguracoes = async () => {
+      try {
+        const configSalva = await AsyncStorage.getItem("configuracoes");
+
+        if (configSalva) {
+          const dados = JSON.parse(configSalva);
+
+          setMinimo(dados.minimo ?? true);
+          setZerado(dados.zerado ?? true);
+          setOrcamento(dados.orcamento ?? false);
+        }
+      } catch (error) {
+        console.log("Erro ao carregar configurações:", error);
+      }
+    };
+
     carregarConfiguracoes();
   }, []);
-
-  const carregarConfiguracoes = async () => {
-    try {
-      const configSalva = await AsyncStorage.getItem("configuracoes");
-
-      if (configSalva) {
-        const dados = JSON.parse(configSalva);
-
-        setMinimo(dados.minimo ?? true);
-        setZerado(dados.zerado ?? true);
-        setOrcamento(dados.orcamento ?? false);
-      }
-    } catch (error) {
-      console.log("Erro ao carregar configurações:", error);
-    }
-  };
 
   const salvarConfiguracoes = async (
     novoMinimo: boolean,

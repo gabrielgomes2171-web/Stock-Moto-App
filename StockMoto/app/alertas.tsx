@@ -103,35 +103,35 @@ export default function Alertas() {
 
   useFocusEffect(
     useCallback(() => {
+      async function carregarAlertas() {
+        try {
+          const configSalva =
+            await AsyncStorage.getItem(
+              "configuracoes"
+            );
+
+          const configuracoes = configSalva
+            ? JSON.parse(configSalva)
+            : {
+                minimo: true,
+                zerado: true,
+                orcamento: false,
+              };
+
+          const lista =
+            await listarAlertasFirebase(
+              configuracoes
+            );
+
+          setAlertas(lista as any[]);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
       carregarAlertas();
     }, [])
   );
-
-  async function carregarAlertas() {
-    try {
-      const configSalva =
-        await AsyncStorage.getItem(
-          "configuracoes"
-        );
-
-      const configuracoes = configSalva
-        ? JSON.parse(configSalva)
-        : {
-            minimo: true,
-            zerado: true,
-            orcamento: false,
-          };
-
-      const lista =
-        await listarAlertasFirebase(
-          configuracoes
-        );
-
-      setAlertas(lista as any[]);
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   const esgotados =
     alertas.filter(

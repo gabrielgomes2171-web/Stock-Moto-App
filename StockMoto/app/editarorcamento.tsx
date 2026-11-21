@@ -28,37 +28,37 @@ export default function EditarOrcamento() {
   }, [subtotal, desconto]);
 
   useEffect(() => {
-    carregarOrcamento();
-  }, []);
+    async function carregarOrcamento() {
+      try {
+        const dados =
+          await buscarOrcamentoPorId(
+            String(id)
+          );
 
-  async function carregarOrcamento() {
-    try {
-      const dados =
-        await buscarOrcamentoPorId(
-          String(id)
+        if (!dados) return;
+
+        setCliente(dados.cliente || "");
+        setTelefone(dados.telefone || "");
+        setMoto(dados.moto || "");
+        setValidade(dados.validade || "");
+        setObservacoes(
+          dados.observacoes || ""
         );
 
-      if (!dados) return;
+        setSubtotal(
+          String(dados.subtotal || 0)
+        );
 
-      setCliente(dados.cliente || "");
-      setTelefone(dados.telefone || "");
-      setMoto(dados.moto || "");
-      setValidade(dados.validade || "");
-      setObservacoes(
-        dados.observacoes || ""
-      );
-
-      setSubtotal(
-        String(dados.subtotal || 0)
-      );
-
-      setDesconto(
-        String(dados.desconto || 0)
-      );
-    } catch (error) {
-      console.log(error);
+        setDesconto(
+          String(dados.desconto || 0)
+        );
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }
+
+    carregarOrcamento();
+  }, [id]);
 
   async function salvarAlteracoes() {
     try {

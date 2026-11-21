@@ -6,12 +6,7 @@ export default function Layout() {
 
     <UserProvider>
 
-      <Stack
-        initialRouteName='(auth)/login'
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="login" />
-      </Stack>
+      <Stack screenOptions={{ headerShown: false }} />
 
     </UserProvider>
 

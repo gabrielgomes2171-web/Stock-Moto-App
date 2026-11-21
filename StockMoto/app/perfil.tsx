@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
 import * as ImagePicker from 'expo-image-picker';
-import { useState, useEffect, } from 'react';
+import { useEffect } from 'react';
 import { useUser } from "../contexts/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -13,16 +13,16 @@ export default function Perfil() {
   const { nome, setNome, imagem, setImagem } = useUser();
 
   useEffect(() => {
+    async function carregarPerfil() {
+      const nomeSalvo = await AsyncStorage.getItem("@nome");
+      const imagemSalva = await AsyncStorage.getItem("@imagem");
+
+      if (nomeSalvo) setNome(nomeSalvo);
+      if (imagemSalva) setImagem(imagemSalva);
+    }
+
     carregarPerfil();
-   }, []);
-
-  async function carregarPerfil() {
-    const nomeSalvo = await AsyncStorage.getItem("@nome");
-    const imagemSalva = await AsyncStorage.getItem("@imagem");
-
-    if (nomeSalvo) setNome(nomeSalvo);
-    if (imagemSalva) setImagem(imagemSalva);
-  }
+  }, [setNome, setImagem]);
   
   async function salvarPerfil() {
     await AsyncStorage.setItem("@nome", nome);

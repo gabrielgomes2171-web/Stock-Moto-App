@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity } from 'react-native';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { View, Text, StyleSheet, TextInput, Image, TouchableOpacity, type ImageSourcePropType } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ImageSourcePropType} from 'react-native';
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 
