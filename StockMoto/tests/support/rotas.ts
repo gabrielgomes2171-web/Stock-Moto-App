@@ -31,12 +31,19 @@ export const ROTAS_AUTENTICACAO: { rota: string; texto: string }[] = [
   { rota: '/redefinir-senha', texto: 'VOLTAR PARA LOGIN' },
 ];
 
-/** Expressão que casa com o conteúdo de qualquer tela interna. */
+/**
+ * Expressão que casa com o conteúdo de QUALQUER uma das 18 telas internas:
+ * reúne os textos identificadores de ROTAS_INTERNAS (nenhum deles aparece
+ * nas telas de autenticação, de carregamento ou de "não encontrada").
+ */
 export const CONTEUDO_INTERNO = new RegExp(
-  ['Painel de Controle', 'MARCAS DE MOTOS', 'ESCOLHA O MODELO', 'Peças em Estoque', 'Editar Perfil', 'Personalize o sistema']
+  [...new Set(ROTAS_INTERNAS.flatMap(({ textos }) => textos))]
     .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
     .join('|')
 );
+
+/** Tempo a partir do qual o app avisa que a verificação da sessão demora. */
+export const AVISO_DEMORA_MS = 10_000;
 
 export function caminhoSemQuery(rota: string) {
   return rota.split('?')[0];

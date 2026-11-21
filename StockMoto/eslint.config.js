@@ -5,7 +5,7 @@ const expoConfig = require('eslint-config-expo/flat');
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ['dist/*'],
+    ignores: ['dist/*', 'dist-e2e/*'],
   },
   {
     // O Auth deve ser criado só em firebase/authInstance*.ts (com a
@@ -29,9 +29,10 @@ module.exports = defineConfig([
     },
   },
   {
-    // Testes E2E devem usar o `test` de tests/support/fixtures.ts, que
-    // bloqueia a rede externa e mocka o Firebase Auth.
-    files: ['tests/**/*.ts'],
+    // Testes E2E devem usar o `test` de tests/support/fixtures.ts, que isola
+    // a rede (bloqueia tráfego externo e mocka o Firebase Auth). Qualquer
+    // outra forma de obter o Playwright contornaria essa proteção.
+    files: ['tests/**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx}'],
     ignores: ['tests/support/fixtures.ts'],
     rules: {
       'no-restricted-imports': [
@@ -46,11 +47,30 @@ module.exports = defineConfig([
               message: 'Use o `auth` exportado por firebase/firebaseConfig.js.',
             },
             {
+              // Tipos e utilitários (expect, devices, type Page...) continuam permitidos.
               name: '@playwright/test',
-              importNames: ['test'],
-              message: 'Importe `test` de ./support/fixtures (bloqueia a rede e mocka o Firebase).',
+              importNames: ['test', 'default'],
+              message: 'Importe `test` de ./support/fixtures (isola a rede e mocka o Firebase).',
             },
           ],
+          patterns: [
+            {
+              group: ['playwright', 'playwright/*', 'playwright-core', 'playwright-core/*', '@playwright/test/*'],
+              message: 'Use ./support/fixtures: importar o Playwright diretamente contorna o isolamento de rede.',
+            },
+          ],
+        },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.name='require'][arguments.0.value=/^(@playwright\\/test|playwright|playwright-core)(\\/.*)?$/]",
+          message: 'Use ./support/fixtures: require() do Playwright contorna o isolamento de rede.',
+        },
+        {
+          selector: "ImportExpression[source.value=/^(@playwright\\/test|playwright|playwright-core)(\\/.*)?$/]",
+          message: 'Use ./support/fixtures: import() dinâmico do Playwright contorna o isolamento de rede.',
         },
       ],
     },

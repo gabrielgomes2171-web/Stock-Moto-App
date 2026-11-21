@@ -8,10 +8,7 @@ import {
   test,
   urlDoCaminho,
 } from './support/fixtures';
-import { CONTEUDO_INTERNO } from './support/rotas';
-
-/** Tempo a partir do qual o app avisa que a verificação está demorando. */
-const AVISO_DEMORA_MS = 10_000;
+import { AVISO_DEMORA_MS, CONTEUDO_INTERNO } from './support/rotas';
 
 test.describe('sessão salva', () => {
   test.beforeEach(async ({ page }) => {
@@ -36,6 +33,11 @@ test.describe('sessão salva', () => {
 
     await page.goto('/estoque');
     await expect(page.getByText('Carregando...')).toBeVisible();
+
+    // Antes do limite: só "Carregando...", ainda sem o aviso de demora.
+    await page.waitForTimeout(AVISO_DEMORA_MS / 2);
+    await expect(page.getByText('Carregando...')).toBeVisible();
+    await expect(page.getByText('Verificando sua sessão...')).toHaveCount(0);
 
     // Após o limite: só um aviso; continua na rota pedida e sem conteúdo interno.
     await expect(page.getByText('Verificando sua sessão...')).toBeVisible({ timeout: AVISO_DEMORA_MS + 5000 });

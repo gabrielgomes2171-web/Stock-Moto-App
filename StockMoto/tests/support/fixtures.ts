@@ -1,13 +1,32 @@
-import { test as base, expect, type Page, type Route } from '@playwright/test';
+import {
+  test as base,
+  expect,
+  type APIRequestContext,
+  type Browser,
+  type BrowserContext,
+  type BrowserType,
+  type Page,
+  type Route,
+} from '@playwright/test';
+
+import { CHAVE_API_TESTE, PROXY_BLOQUEADO } from './rede';
 
 /**
- * Fixtures dos testes E2E.
+ * Fixtures dos testes E2E — isolamento total de rede.
  *
- * Nenhuma requisição sai da máquina:
- * - identitytoolkit.googleapis.com (Firebase Auth) é respondido por um
- *   mock local, com um usuário fictício;
- * - qualquer outro host externo (Firestore etc.) é bloqueado.
- * Não há credenciais reais nem chamadas ao projeto Firebase.
+ * Camadas (qualquer uma sozinha já impede acesso ao Firebase de produção):
+ * 1. Build de teste com projeto fictício "demo-stockmoto" (verificado antes
+ *    de o servidor subir: tests/support/verificar-build-teste.mjs).
+ * 2. Proxy inexistente + service workers bloqueados (playwright.config.ts e
+ *    forçados aqui em todo contexto criado).
+ * 3. Estes fixtures: TODO contexto (o padrão, os de browser.newContext(),
+ *    browser.newPage(), launch manual), suas abas, WebSockets e as
+ *    requisições de API do Playwright só alcançam a origem do app. O
+ *    Firebase Auth é respondido por um mock local; o Firestore recebe uma
+ *    falha local (como se estivesse offline).
+ *
+ * Qualquer outra tentativa de comunicação externa é bloqueada, registrada e
+ * FAZ O TESTE FALHAR ao final (fixture `rede`).
  */
 
 /** Como o mock responde à validação do usuário (accounts:lookup). */
@@ -17,54 +36,93 @@ export type ModoValidacao =
   | 'falha-rede' // derruba a conexão (Firebase: auth/network-request-failed)
   | 'revogado'; // conta desativada (Firebase invalida a sessão)
 
+export type Violacao = {
+  tipo: 'http' | 'websocket' | 'api' | 'chave-api';
+  url: string;
+};
+
 const USUARIO = { localId: 'uid-teste-e2e', email: 'e2e@exemplo.com' };
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': '*',
   'Content-Type': 'application/json',
 };
+const HOST_AUTH = 'identitytoolkit.googleapis.com';
+const HOST_FIRESTORE = 'firestore.googleapis.com';
+const CONECTIVIDADE_FIRESTORE = '/images/cleardot.gif';
+
+/** Opções aplicadas a todo contexto criado durante os testes. */
+const OPCOES_OBRIGATORIAS = {
+  serviceWorkers: 'block' as const,
+  proxy: PROXY_BLOQUEADO,
+};
+
+/**
+ * Tentativas não autorizadas do teste em execução. Cada worker é um
+ * processo e roda um teste por vez, então a lista é zerada a cada teste.
+ */
+const violacoes: Violacao[] = [];
+
+function registrar(tipo: Violacao['tipo'], url: string) {
+  violacoes.push({ tipo, url: ocultarChave(url) });
+}
+
+function ocultarChave(url: string) {
+  return url.replace(/([?&]key=)[^&]+/, '$1***');
+}
 
 export class FirebaseAuthMock {
   modoValidacao: ModoValidacao = 'ok';
   /** Operações do Auth recebidas pelo mock (ex.: signInWithPassword). */
   readonly operacoes: string[] = [];
-  /** Hosts externos que o app tentou acessar e foram bloqueados. */
-  readonly hostsBloqueados = new Set<string>();
+  /** Requisições ao Firestore, respondidas localmente com falha. */
+  requisicoesFirestore = 0;
   private pendentes: Route[] = [];
 
-  async instalar(page: Page, baseURL: string) {
-    const contexto = page.context();
+  /** Trata uma requisição para fora da origem do app. */
+  tratarExterna(route: Route) {
+    const url = new URL(route.request().url());
 
-    await contexto.route(
-      (url) => !url.href.startsWith(baseURL),
-      (route) => {
-        this.hostsBloqueados.add(new URL(route.request().url()).host);
-        return route.abort();
-      }
-    );
+    if (url.host === HOST_AUTH) return this.responderAuth(route, url);
 
-    await contexto.route('**/identitytoolkit.googleapis.com/**', (route) => {
-      const requisicao = route.request();
-      if (requisicao.method() === 'OPTIONS') {
-        return route.fulfill({ status: 204, headers: CORS });
-      }
-      const operacao = new URL(requisicao.url()).pathname.split(':').pop() ?? '';
-      this.operacoes.push(operacao);
+    // Firestore e o teste de conectividade do WebChannel que o SDK do
+    // Firestore faz quando a conexão falha (imagem fixa do google.com).
+    // Ambos recebem uma falha local, como se o aparelho estivesse offline.
+    if (url.host === HOST_FIRESTORE || (url.host === 'www.google.com' && url.pathname === CONECTIVIDADE_FIRESTORE)) {
+      this.requisicoesFirestore++;
+      return route.abort('internetdisconnected');
+    }
 
-      if (operacao === 'lookup') {
-        if (this.modoValidacao === 'pendente') {
-          this.pendentes.push(route);
-          return;
-        }
-        if (this.modoValidacao === 'falha-rede') {
-          return route.abort('internetdisconnected');
-        }
-        if (this.modoValidacao === 'revogado') {
-          return responder(route, 400, { error: { code: 400, message: 'USER_DISABLED' } });
-        }
+    registrar('http', url.href);
+    return route.abort('blockedbyclient');
+  }
+
+  private responderAuth(route: Route, url: URL) {
+    if (route.request().method() === 'OPTIONS') {
+      return route.fulfill({ status: 204, headers: CORS });
+    }
+    // Só o build de teste (projeto demo-) é aceito pelo mock.
+    if (url.searchParams.get('key') !== CHAVE_API_TESTE) {
+      registrar('chave-api', url.href);
+      return route.abort('blockedbyclient');
+    }
+
+    const operacao = url.pathname.split(':').pop() ?? '';
+    this.operacoes.push(operacao);
+
+    if (operacao === 'lookup') {
+      if (this.modoValidacao === 'pendente') {
+        this.pendentes.push(route);
+        return;
       }
-      return responderOperacao(route, operacao);
-    });
+      if (this.modoValidacao === 'falha-rede') {
+        return route.abort('internetdisconnected');
+      }
+      if (this.modoValidacao === 'revogado') {
+        return responder(route, 400, { error: { code: 400, message: 'USER_DISABLED' } });
+      }
+    }
+    return responderOperacao(route, operacao);
   }
 
   /** Libera as validações seguradas no modo 'pendente'. */
@@ -103,28 +161,177 @@ function responderOperacao(route: Route, operacao: string) {
 function registrarHistorico() {
   const w = window as unknown as { __rotas: string[] };
   w.__rotas = [location.pathname];
-  const registrar = () => w.__rotas.push(location.pathname);
+  const registrarRota = () => w.__rotas.push(location.pathname);
   for (const metodo of ['pushState', 'replaceState'] as const) {
     const original = history[metodo];
     history[metodo] = function (this: History, ...args: Parameters<History['pushState']>) {
       const resultado = original.apply(this, args);
-      registrar();
+      registrarRota();
       return resultado;
     };
   }
-  addEventListener('popstate', registrar);
+  addEventListener('popstate', registrarRota);
 }
 
-export const test = base.extend<{ firebase: FirebaseAuthMock }>({
-  // auto: true => instalado em TODO teste e hook (beforeEach incluído),
-  // mesmo que o teste não peça o fixture. Sem isso, um teste que só usa
-  // `page` poderia acessar o Firebase real.
-  firebase: [
-    async ({ page, baseURL }, use) => {
+// ---------------------------------------------------------------------------
+// Proteção de contextos, navegadores e requisições de API
+// ---------------------------------------------------------------------------
+
+const mocksPorContexto = new WeakMap<BrowserContext, Promise<FirebaseAuthMock>>();
+const apisProtegidas = new WeakSet<APIRequestContext>();
+const browsersProtegidos = new WeakSet<Browser>();
+
+/** Instala a proteção num contexto (idempotente) e devolve o mock do Auth. */
+function protegerContexto(contexto: BrowserContext, origem: string): Promise<FirebaseAuthMock> {
+  let pronto = mocksPorContexto.get(contexto);
+  if (!pronto) {
+    pronto = (async () => {
       const mock = new FirebaseAuthMock();
-      await page.context().addInitScript(registrarHistorico);
-      await mock.instalar(page, baseURL!);
-      await use(mock);
+      await contexto.routeWebSocket(
+        () => true,
+        (ws) => {
+          registrar('websocket', ws.url());
+          return ws.close({ code: 1008, reason: 'Bloqueado pelos testes' });
+        }
+      );
+      await contexto.route(
+        (url) => url.origin !== origem,
+        (route) => mock.tratarExterna(route)
+      );
+      await contexto.addInitScript(registrarHistorico);
+      protegerApi(contexto.request, origem);
+      return mock;
+    })();
+    mocksPorContexto.set(contexto, pronto);
+  }
+  return pronto;
+}
+
+const METODOS_API = ['fetch', 'get', 'post', 'put', 'patch', 'delete', 'head'] as const;
+
+/** Restringe um APIRequestContext à origem do app (idempotente). */
+function protegerApi(api: APIRequestContext, origem: string): APIRequestContext {
+  if (apisProtegidas.has(api)) return api;
+  apisProtegidas.add(api);
+  for (const metodo of METODOS_API) {
+    const original = api[metodo].bind(api) as (...args: unknown[]) => Promise<unknown>;
+    Object.defineProperty(api, metodo, {
+      value: (alvo: string | { url(): string }, ...resto: unknown[]) => {
+        const url = new URL(typeof alvo === 'string' ? alvo : alvo.url(), origem);
+        if (url.origin !== origem) {
+          registrar('api', url.href);
+          return Promise.reject(new Error(`Requisição externa bloqueada pelos testes: ${ocultarChave(url.href)}`));
+        }
+        return original(alvo, ...resto);
+      },
+    });
+  }
+  return api;
+}
+
+/** Faz todo contexto criado por este navegador nascer protegido. */
+function protegerBrowser(browser: Browser, origem: string) {
+  if (browsersProtegidos.has(browser)) return;
+  browsersProtegidos.add(browser);
+  const novoContexto = browser.newContext.bind(browser);
+  // browser.newPage() usa this.newContext() internamente, então também é coberto.
+  browser.newContext = async (opcoes = {}) => {
+    const contexto = await novoContexto({ ...opcoes, ...OPCOES_OBRIGATORIAS });
+    await protegerContexto(contexto, origem);
+    return contexto;
+  };
+}
+
+/** Garante a proteção também em navegadores lançados manualmente. */
+function protegerTipoDeNavegador(tipo: BrowserType, origem: string) {
+  const launch = tipo.launch.bind(tipo);
+  tipo.launch = async (opcoes = {}) => {
+    // Proxy no nível do navegador: cobre também o tráfego de segundo plano.
+    const browser = await launch({ ...opcoes, proxy: PROXY_BLOQUEADO });
+    protegerBrowser(browser, origem);
+    return browser;
+  };
+  const connect = tipo.connect.bind(tipo) as BrowserType['connect'];
+  tipo.connect = (async (...args: Parameters<BrowserType['connect']>) => {
+    const browser = await connect(...args);
+    protegerBrowser(browser, origem);
+    return browser;
+  }) as BrowserType['connect'];
+  const connectOverCDP = tipo.connectOverCDP.bind(tipo) as BrowserType['connectOverCDP'];
+  tipo.connectOverCDP = (async (...args: Parameters<BrowserType['connectOverCDP']>) => {
+    const browser = await connectOverCDP(...args);
+    protegerBrowser(browser, origem);
+    return browser;
+  }) as BrowserType['connectOverCDP'];
+  const persistente = tipo.launchPersistentContext.bind(tipo);
+  tipo.launchPersistentContext = async (pasta, opcoes = {}) => {
+    const contexto = await persistente(pasta, { ...opcoes, ...OPCOES_OBRIGATORIAS });
+    await protegerContexto(contexto, origem);
+    return contexto;
+  };
+}
+
+/** Controle das tentativas de comunicação externa do teste atual. */
+export type ControleRede = {
+  /** Retira e devolve as tentativas registradas (para testes da própria proteção). */
+  consumirViolacoes(): Violacao[];
+};
+
+export const test = base.extend<
+  { firebase: FirebaseAuthMock; rede: ControleRede },
+  { _protecaoWorker: { origem: string } }
+>({
+  // Worker: protege launch/connect e as requisições de API antes de
+  // qualquer navegador ou fixture `request` ser criado.
+  _protecaoWorker: [
+    async ({ playwright }, use, workerInfo) => {
+      const baseURL = workerInfo.project.use.baseURL;
+      if (!baseURL) throw new Error('baseURL é obrigatório para isolar a rede dos testes');
+      const origem = new URL(baseURL).origin;
+
+      for (const tipo of [playwright.chromium, playwright.firefox, playwright.webkit]) {
+        protegerTipoDeNavegador(tipo, origem);
+      }
+      const novaApi = playwright.request.newContext.bind(playwright.request);
+      playwright.request.newContext = async (opcoes = {}) =>
+        protegerApi(await novaApi({ ...opcoes, proxy: PROXY_BLOQUEADO }), origem);
+
+      await use({ origem });
+    },
+    { scope: 'worker', auto: true },
+  ],
+
+  // Caso o navegador padrão tenha sido criado antes do patch acima.
+  browser: [
+    async ({ browser, _protecaoWorker }, use) => {
+      protegerBrowser(browser, _protecaoWorker.origem);
+      await use(browser);
+    },
+    { scope: 'worker' },
+  ],
+
+  // Contexto padrão dos testes (também cobre o modo de reuso do --ui).
+  context: async ({ context, _protecaoWorker }, use) => {
+    await protegerContexto(context, _protecaoWorker.origem);
+    await use(context);
+  },
+
+  // Falha o teste se houve qualquer tentativa externa não autorizada.
+  // auto: true => vale para todo teste e hook, mesmo que não o peçam.
+  rede: [
+    async ({}, use) => {
+      violacoes.length = 0;
+      await use({ consumirViolacoes: () => violacoes.splice(0) });
+      expect(violacoes, 'Tentativas de comunicação externa não autorizadas').toEqual([]);
+    },
+    { auto: true },
+  ],
+
+  // Mock do Firebase Auth do contexto padrão. auto: true => instalado
+  // antes de qualquer hook (beforeEach incluído).
+  firebase: [
+    async ({ context, _protecaoWorker }, use) => {
+      await use(await protegerContexto(context, _protecaoWorker.origem));
     },
     { auto: true },
   ],

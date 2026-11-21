@@ -6,6 +6,8 @@ node_modules/
 # Expo
 .expo/
 dist/
+# build web exclusivo dos testes E2E (projeto Firebase demo-)
+dist-e2e/
 web-build/
 expo-env.d.ts
 

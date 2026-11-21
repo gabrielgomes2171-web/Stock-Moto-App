@@ -1,19 +1,26 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { PORTA_TESTES, PROXY_BLOQUEADO } from './tests/support/rede';
+
 /**
- * Testes E2E do build web do app.
+ * Testes E2E do build web do app. Ver a seção "Testes automatizados" do
+ * README para instalação e execução.
  *
- * O webServer gera o build web estático (expo export) e o serve com
- * `expo serve`. Os testes não acessam o Firebase real: o Auth é mockado
- * e todo host externo é bloqueado (ver tests/support/fixtures.ts).
+ * O webServer:
+ * 1. gera um build web PRÓPRIO dos testes em dist-e2e/ (não toca no dist/),
+ *    com EXPO_PUBLIC_FIREBASE_AMBIENTE=teste => projeto fictício
+ *    "demo-stockmoto", nunca o Firebase de produção;
+ * 2. confere que o build só contém projetos "demo-"
+ *    (tests/support/verificar-build-teste.mjs) — se não, a suíte não roda;
+ * 3. serve o build em uma porta exclusiva, sempre iniciado do zero
+ *    (sem reaproveitar um servidor antigo).
  *
- * Para reaproveitar um servidor já em execução localmente:
- *   npx expo export --platform web && npx expo serve --port 8085
+ * A rede dos testes é isolada em camadas: proxy inexistente, service
+ * workers bloqueados e os fixtures de tests/support/fixtures.ts.
  *
  * See https://playwright.dev/docs/test-configuration.
  */
-const PORTA = 8085;
-const BASE_URL = `http://localhost:${PORTA}`;
+const BASE_URL = `http://localhost:${PORTA_TESTES}`;
 
 export default defineConfig({
   testDir: './tests',
@@ -32,6 +39,13 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     baseURL: BASE_URL,
+    /* Camada de rede: todo tráfego externo vai para um proxy inexistente.
+       - proxy: requisições das páginas e do fixture `request` (por contexto);
+       - launchOptions.proxy: tráfego do próprio navegador (serviços de
+         segundo plano, atualizações), que não passa pelos contextos. */
+    proxy: PROXY_BLOQUEADO,
+    launchOptions: { proxy: PROXY_BLOQUEADO },
+    serviceWorkers: 'block',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -55,12 +69,21 @@ export default defineConfig({
     },
   ],
 
-  /* Gera o build web e serve antes dos testes. */
+  /* Gera o build de teste, confere que é "demo-" e serve antes dos testes. */
   webServer: {
-    command: `npx expo export --platform web && npx expo serve --port ${PORTA}`,
+    command:
+      'npx expo export --platform web --clear --output-dir dist-e2e' +
+      ' && node tests/support/verificar-build-teste.mjs dist-e2e' +
+      ` && npx expo serve dist-e2e --port ${PORTA_TESTES}`,
     url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
+    /* Nunca reaproveita silenciosamente um servidor antigo: se a porta já
+       estiver ocupada, a execução falha. */
+    reuseExistingServer: false,
     timeout: 5 * 60 * 1000,
-    env: { CI: '1' },
+    env: {
+      CI: '1',
+      EXPO_PUBLIC_FIREBASE_AMBIENTE: 'teste',
+      EXPO_NO_TELEMETRY: '1',
+    },
   },
 });
