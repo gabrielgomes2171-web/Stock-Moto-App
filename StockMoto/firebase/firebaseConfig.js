@@ -1,29 +1,19 @@
-import { initializeApp } from 'firebase/app';
-
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-import { getAuth } from 'firebase/auth';
-
 const firebaseConfig = {
-
-  apiKey: "AIzaSyCP3Xd4_EjR2im5nWN3GTD5TPSngTc5FB8",
-
-  authDomain: "motostock-eabc6.firebaseapp.com",
-
-  projectId: "motostock-eabc6",
-
-  storageBucket: "motostock-eabc6.firebasestorage.app",
-
-  messagingSenderId: "200886797291",
-
-  appId: "1:200886797291:web:95cd9c9ae48333301fcfae",
-
+  apiKey: "AIzaSyA1Lh-yA6XGTc2hij5exN_0pye6C-rh7hM",
+  authDomain: "stockmoto-a922d.firebaseapp.com",
+  projectId: "stockmoto-a922d",
+  storageBucket: "stockmoto-a922d.firebasestorage.app",
+  messagingSenderId: "364911465739",
+  appId: "1:364911465739:web:a321dda542ff3e139cbe0e",
+  measurementId: "G-8QPCH9QQR1"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export const dbFirebase =
-  getFirestore(app);
-
-export const auth =
-  getAuth(app);
+export const auth = getAuth(app);
+export const dbFirebase = getFirestore(app);
+export default app;
