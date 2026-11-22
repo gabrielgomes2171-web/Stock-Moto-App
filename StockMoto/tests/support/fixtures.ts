@@ -41,7 +41,19 @@ export type Violacao = {
   url: string;
 };
 
-const USUARIO = { localId: 'uid-teste-e2e', email: 'e2e@exemplo.com' };
+/** Usuário padrão dos testes. Outros e-mails viram usuários fictícios distintos. */
+export const EMAIL_PADRAO = 'e2e@exemplo.com';
+
+/** Usuário fictício correspondente a um e-mail (uid estável por e-mail). */
+export function usuarioDoEmail(email: string) {
+  const normalizado = email.trim().toLowerCase();
+  const localId = normalizado === EMAIL_PADRAO ? 'uid-teste-e2e' : `uid-${normalizado.replace(/[^a-z0-9]/g, '-')}`;
+  return { localId, email: normalizado };
+}
+
+const PREFIXO_TOKEN = 'id-token-falso:';
+/** E-mail de cada uid que já entrou (para responder accounts:lookup). */
+const emailsPorUid = new Map<string, string>([[usuarioDoEmail(EMAIL_PADRAO).localId, EMAIL_PADRAO]]);
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': '*',
@@ -138,17 +150,31 @@ function responder(route: Route, status: number, corpo: unknown) {
 }
 
 function responderOperacao(route: Route, operacao: string) {
-  const tokens = { idToken: 'id-token-falso', refreshToken: 'refresh-falso', expiresIn: '3600', ...USUARIO };
+  const corpo = (route.request().postDataJSON() ?? {}) as { email?: string; idToken?: string };
   switch (operacao) {
     case 'signInWithPassword':
-    case 'signUp':
-      return responder(route, 200, tokens);
-    case 'lookup':
+    case 'signUp': {
+      // Cada e-mail é um usuário distinto; o uid vai dentro do token falso.
+      const usuario = usuarioDoEmail(corpo.email ?? EMAIL_PADRAO);
+      emailsPorUid.set(usuario.localId, usuario.email);
       return responder(route, 200, {
-        users: [{ ...USUARIO, emailVerified: false, providerUserInfo: [], createdAt: '1', lastLoginAt: '1' }],
+        idToken: PREFIXO_TOKEN + usuario.localId,
+        refreshToken: 'refresh-falso',
+        expiresIn: '3600',
+        ...usuario,
       });
+    }
+    case 'lookup': {
+      const localId = corpo.idToken?.startsWith(PREFIXO_TOKEN)
+        ? corpo.idToken.slice(PREFIXO_TOKEN.length)
+        : usuarioDoEmail(EMAIL_PADRAO).localId;
+      const email = emailsPorUid.get(localId) ?? EMAIL_PADRAO;
+      return responder(route, 200, {
+        users: [{ localId, email, emailVerified: false, providerUserInfo: [], createdAt: '1', lastLoginAt: '1' }],
+      });
+    }
     case 'sendOobCode':
-      return responder(route, 200, { email: USUARIO.email });
+      return responder(route, 200, { email: corpo.email ?? EMAIL_PADRAO });
     default:
       return responder(route, 400, { error: { code: 400, message: 'OPERACAO_NAO_MOCKADA' } });
   }
@@ -359,9 +385,9 @@ export function urlDoCaminho(caminho: string) {
 }
 
 /** Faz login pela tela de login (Auth mockado) e espera chegar em /inicial. */
-export async function fazerLogin(page: Page) {
+export async function fazerLogin(page: Page, email = EMAIL_PADRAO) {
   await page.goto('/login');
-  await page.getByPlaceholder('Email').fill('e2e@exemplo.com');
+  await page.getByPlaceholder('Email').fill(email);
   await page.getByPlaceholder('Senha').fill('senha-de-teste');
   await page.getByText('ENTRAR NA CONTA').click();
   await expect(page.getByText('Painel de Controle')).toBeVisible();

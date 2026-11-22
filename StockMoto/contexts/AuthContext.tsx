@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged, type User } from "firebase/auth";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 
 import { auth } from "../firebase/firebaseConfig";
 
@@ -27,6 +27,15 @@ type AuthContextType = {
   carregando: boolean;
   /** true se a confirmação inicial já passou de LIMITE_AVISO_DEMORA_MS. */
   demorando: boolean;
+  /**
+   * Encerra a sessão no Firebase. Não altera `usuario` diretamente: quem
+   * atualiza o estado é o onAuthStateChanged, quando o Firebase confirma.
+   * Chamadas repetidas enquanto o encerramento está em andamento
+   * reaproveitam a mesma operação. Rejeita se o Firebase falhar.
+   */
+  sair: () => Promise<void>;
+  /** true enquanto o encerramento da sessão está em andamento. */
+  saindo: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,6 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [usuario, setUsuario] = useState<User | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [demorando, setDemorando] = useState(false);
+  const [saindo, setSaindo] = useState(false);
+  const operacaoSair = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
     // Variáveis locais a esta execução do efeito: uma remontagem (ex.:
@@ -64,8 +75,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const sair = useCallback(() => {
+    if (operacaoSair.current) {
+      return operacaoSair.current;
+    }
+
+    setSaindo(true);
+    const operacao = signOut(auth).finally(() => {
+      operacaoSair.current = null;
+      setSaindo(false);
+    });
+    operacaoSair.current = operacao;
+    return operacao;
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ usuario, carregando, demorando }}>
+    <AuthContext.Provider value={{ usuario, carregando, demorando, sair, saindo }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,36 +1,34 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
 import * as ImagePicker from 'expo-image-picker';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useUser } from "../contexts/UserContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Perfil() {
-  const router = useRouter();
-  const { nome, setNome, imagem, setImagem } = useUser();
+  // O perfil (nome e foto) é carregado pelo UserProvider para o usuário
+  // autenticado; ver contexts/UserContext.tsx.
+  const { nome, setNome, imagem, setImagem, salvarPerfil: salvarPerfilDoUsuario } = useUser();
+  const { sair, saindo } = useAuth();
+  const [erroSair, setErroSair] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function carregarPerfil() {
-      const nomeSalvo = await AsyncStorage.getItem("@nome");
-      const imagemSalva = await AsyncStorage.getItem("@imagem");
-
-      if (nomeSalvo) setNome(nomeSalvo);
-      if (imagemSalva) setImagem(imagemSalva);
-    }
-
-    carregarPerfil();
-  }, [setNome, setImagem]);
-  
   async function salvarPerfil() {
-    await AsyncStorage.setItem("@nome", nome);
-    
-    if (imagem) {
-      await AsyncStorage.setItem("@imagem", imagem);
-    } 
+    await salvarPerfilDoUsuario();
     alert("Perfil salvo com sucesso!");
+  }
+
+  // Encerra a sessão no Firebase. A navegação para /login é feita pelo
+  // Stack.Protected (app/_layout.tsx) quando o Firebase confirma o logout.
+  async function sairDaConta() {
+    setErroSair(null);
+    try {
+      await sair();
+    } catch (error) {
+      console.log("Erro ao sair da conta:", error);
+      setErroSair("Não foi possível sair da conta. Tente novamente.");
+    }
   }
 
   async function selecionarImagem() {
@@ -130,11 +128,27 @@ export default function Perfil() {
         </Text>
 
         <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={() => router.replace('/login')}
+          style={[styles.logoutButton, saindo && styles.logoutButtonDisabled]}
+          onPress={sairDaConta}
+          disabled={saindo}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: saindo, busy: saindo }}
           >
-          <Text style={styles.logoutText}>SAIR</Text>
+          {saindo ? (
+            <View style={styles.logoutLoading}>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.logoutText}>SAINDO...</Text>
+            </View>
+          ) : (
+            <Text style={styles.logoutText}>SAIR</Text>
+          )}
         </TouchableOpacity>
+
+        {erroSair && (
+          <Text style={styles.logoutError} accessibilityRole="alert">
+            {erroSair}
+          </Text>
+        )}
       </View>
 
     </SafeAreaView>
@@ -294,5 +308,22 @@ const styles = StyleSheet.create({
   logoutText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+
+  logoutButtonDisabled: {
+    opacity: 0.6,
+  },
+
+  logoutLoading: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  logoutError: {
+    color: "#FF8A80",
+    fontSize: 13,
+    marginTop: 10,
+    textAlign: "center",
   },
 });
