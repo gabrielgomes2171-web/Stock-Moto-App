@@ -140,3 +140,27 @@ export async function removerQuantidadeFirebase(
     quantidade: increment(-1),
   });
 }
+
+// Lista produtos cuja Categoria é igual ao nome informado (ex: acessório "LUVAS").
+// A comparação ignora maiúsculas/minúsculas e espaços extras.
+export async function listarProdutosPorCategoriaFirebase(categoria) {
+  const usuario = auth.currentUser;
+
+  if (!usuario) {
+    return [];
+  }
+
+  const q = query(
+    collection(dbFirebase, 'produtos'),
+    where('usuario_id', '==', usuario.uid)
+  );
+
+  const snapshot = await getDocs(q);
+  const alvo = (categoria || '').trim().toUpperCase();
+
+  return snapshot.docs
+    .map((documento) => ({ id: documento.id, ...documento.data() }))
+    .filter(
+      (produto) => (produto.categoria || '').trim().toUpperCase() === alvo
+    );
+}

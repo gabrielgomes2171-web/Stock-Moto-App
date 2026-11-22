@@ -1,17 +1,31 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from "react-native";
+import React, { useCallback, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
+import ModeloCard from "@/components/ModeloCard";
+import { listarModelosPorMarcaFirebase } from "../firebase/categoriasFirebase";
 
 export default function EstoqueHonda() {
     const router = useRouter();
+    const [modelosExtras, setModelosExtras] = useState<any[]>([]);
+
+    // Modelos Honda adicionados na tela "Adicionar ao Estoque"
+    useFocusEffect(
+      useCallback(() => {
+        listarModelosPorMarcaFirebase("HONDA")
+          .then((dados) => setModelosExtras(dados as any[]))
+          .catch((error) => console.log(error));
+      }, [])
+    );
+
     return (
 
         <View style={styles.container}>
 
             <Header title="Estoque Honda" showSettings />
 
-            <View style={styles.content}>
+            <ScrollView contentContainerStyle={styles.content}>
 
                 <View style={styles.brandBox}>
                     
@@ -88,8 +102,12 @@ export default function EstoqueHonda() {
                     />
                 </TouchableOpacity>
 
+                {modelosExtras.map((modelo) => (
+                  <ModeloCard key={modelo.id} modelo={modelo} />
+                ))}
+
             </View>
-        </View>
+        </ScrollView>
         <Footer active="estoque" />
         </View>
      );
@@ -103,7 +121,7 @@ const styles = StyleSheet.create({
   
   content: {
     padding: 16,
-    flex: 1,
+    paddingBottom: 120,
   },
 
   brandBox: {

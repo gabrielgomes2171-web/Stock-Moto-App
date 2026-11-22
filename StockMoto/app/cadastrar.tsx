@@ -9,7 +9,8 @@ import {
   Alert,
 } from 'react-native';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 
 import Header from '../components/Header';
@@ -21,6 +22,17 @@ import { Picker } from '@react-native-picker/picker';
 import {
   cadastrarProdutoFirebase,
 } from '../firebase/produtosFirebase';
+
+import { listarCategoriasFirebase } from '../firebase/categoriasFirebase';
+
+const MODELOS_FIXOS = [
+  'CG 160 FAN',
+  'CG 160 TITAN',
+  'CG 160 START',
+  'CG 160 CARGO',
+  'BIZ 125',
+  'XRE 300',
+];
 
 export default function Cadastrar() {
   const [nome, setNome] = useState('');
@@ -35,6 +47,22 @@ export default function Cadastrar() {
   const [quantidade, setQuantidade] = useState('');
   const [estoqueMinimo, setEstoqueMinimo] = useState('');
   const [imagem, setImagem] = useState('');
+  const [modelosExtras, setModelosExtras] = useState<string[]>([]);
+
+  // Carrega os modelos adicionados em "Adicionar ao Estoque"
+  useFocusEffect(
+    useCallback(() => {
+      listarCategoriasFirebase('modelo')
+        .then((dados: any[]) =>
+          setModelosExtras(
+            dados
+              .map((m) => m.nome)
+              .filter((n) => !MODELOS_FIXOS.includes(n))
+          )
+        )
+        .catch((error) => console.log(error));
+    }, [])
+  );
 
   async function escolherImagem() {
     const permissao =
@@ -191,12 +219,9 @@ export default function Cadastrar() {
               color="#999"
             />
 
-            <Picker.Item label="CG 160 FAN" value="CG 160 FAN" />
-            <Picker.Item label="CG 160 TITAN" value="CG 160 TITAN" />
-            <Picker.Item label="CG 160 START" value="CG 160 START" />
-            <Picker.Item label="CG 160 CARGO" value="CG 160 CARGO" />
-            <Picker.Item label="BIZ 125" value="BIZ 125" />
-            <Picker.Item label="XRE 300" value="XRE 300" />
+            {[...MODELOS_FIXOS, ...modelosExtras].map((modelo) => (
+              <Picker.Item key={modelo} label={modelo} value={modelo} />
+            ))}
           </Picker>
         </View>
 
