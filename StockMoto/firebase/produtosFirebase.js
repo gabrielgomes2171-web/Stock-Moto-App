@@ -164,3 +164,25 @@ export async function listarProdutosPorCategoriaFirebase(categoria) {
       (produto) => (produto.categoria || '').trim().toUpperCase() === alvo
     );
 }
+
+
+// Lista todas as peças/produtos do usuário (usado na busca da tela inicial)
+export async function listarTodosProdutosFirebase() {
+  const usuario = auth.currentUser;
+
+  if (!usuario) {
+    return [];
+  }
+
+  const q = query(
+    collection(dbFirebase, 'produtos'),
+    where('usuario_id', '==', usuario.uid)
+  );
+
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs.map((documento) => ({
+    id: documento.id,
+    ...documento.data(),
+  }));
+}

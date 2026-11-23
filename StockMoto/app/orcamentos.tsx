@@ -5,10 +5,19 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState, useCallback } from "react";
 import { useFocusEffect } from "expo-router/react-navigation";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { listarOrcamentosFirebase, excluirOrcamentoFirebase } from "../services/orcamentosFirebase";
+
+// Altura da barra do Footer (65) + distância dela até a borda (bottom: 5)
+const ALTURA_FOOTER = 70;
 
 export default function Orcamentos() {
   const router = useRouter();
+
+  // Espaço que o sistema ocupa embaixo da tela (barra de navegação do Android,
+  // barrinha de gestos do iPhone). Muda de aparelho para aparelho.
+  const insets = useSafeAreaInsets();
+  const distanciaBotao = ALTURA_FOOTER + insets.bottom + 12;
 
   const [orcamentos, setOrcamentos] = useState<any[]>([]);
   const [busca, setBusca] = useState("");
@@ -184,13 +193,14 @@ export default function Orcamentos() {
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
-              paddingBottom: 120,
+              // espaço para a lista não ficar escondida atrás do botão e do Footer
+              paddingBottom: distanciaBotao + 70,
             }}
           />
         )}
       </View>
 
-      <View style={styles.fixedButtonContainer}>
+      <View style={[styles.fixedButtonContainer, { bottom: distanciaBotao }]}>
         <TouchableOpacity
           style={styles.button}
           onPress={() =>
@@ -323,7 +333,6 @@ const styles = StyleSheet.create({
 
   fixedButtonContainer: {
     position: "absolute",
-    bottom: 90,
     left: 16,
     right: 16,
   },
