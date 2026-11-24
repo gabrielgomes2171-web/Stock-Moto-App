@@ -10,6 +10,9 @@ import {
   getDocs,
   query,
   where,
+  doc,
+  getDoc,
+  setDoc,
 } from 'firebase/firestore';
 
 import {
@@ -116,4 +119,46 @@ export async function buscarUsuarioFirebase(
 
   return querySnapshot;
 
+}
+
+/* =========================
+   PERFIL (nome e foto)
+   Fica em "perfis/{uid}", um documento por conta.
+========================= */
+
+export async function buscarPerfilFirebase(uid) {
+  const perfil = await getDoc(doc(dbFirebase, 'perfis', uid));
+
+  if (perfil.exists()) {
+    return perfil.data();
+  }
+
+  // Ainda não salvou o perfil: usa o nome digitado ao criar a conta
+  const q = query(
+    collection(dbFirebase, 'usuarios'),
+    where('uid', '==', uid)
+  );
+
+  const resultado = await getDocs(q);
+
+  if (!resultado.empty) {
+    return {
+      nome: resultado.docs[0].data().nome || '',
+      imagem: '',
+    };
+  }
+
+  return null;
+}
+
+export async function salvarPerfilFirebase(uid, dados) {
+  await setDoc(
+    doc(dbFirebase, 'perfis', uid),
+    {
+      nome: dados.nome,
+      imagem: dados.imagem || '',
+      atualizado_em: new Date(),
+    },
+    { merge: true }
+  );
 }

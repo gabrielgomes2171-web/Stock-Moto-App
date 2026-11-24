@@ -3,56 +3,47 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Footer from "../components/Footer";
-import * as ImagePicker from 'expo-image-picker';
-import { useState, useEffect, } from 'react';
 import { useUser } from "../contexts/UserContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
+import { escolherImagemBase64 } from "../services/imagemBase64";
 
 export default function Perfil() {
   const router = useRouter();
-  const { nome, setNome, imagem, setImagem } = useUser();
+  const { nome, setNome, imagem, setImagem, email, salvarPerfil: salvarNoContexto } = useUser();
 
-  useEffect(() => {
-    carregarPerfil();
-   }, []);
+  // O nome e a foto já chegam carregados pelo UserContext,
+  // então esta tela não precisa mais buscar nada ao abrir.
 
-  async function carregarPerfil() {
-    const nomeSalvo = await AsyncStorage.getItem("@nome");
-    const imagemSalva = await AsyncStorage.getItem("@imagem");
-
-    if (nomeSalvo) setNome(nomeSalvo);
-    if (imagemSalva) setImagem(imagemSalva);
-  }
-  
   async function salvarPerfil() {
-    await AsyncStorage.setItem("@nome", nome);
-    
-    if (imagem) {
-      await AsyncStorage.setItem("@imagem", imagem);
-    } 
-    alert("Perfil salvo com sucesso!");
-  }
-
-  async function selecionarImagem() {
-    const permission =
-    await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permission.granted) {
-       alert("Permissão necessária!");
-       return;
+    try {
+      await salvarNoContexto();
+      alert("Perfil salvo com sucesso!");
+    } catch (error) {
+      console.log(error);
+      alert("Não foi possível salvar o perfil.");
     }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-     });
-
-     if (!result.canceled) {
-      setImagem(result.assets[0].uri);
-      }
   }
+
+  // Escolhe a foto, diminui o tamanho e guarda como texto (base64),
+  // para ela não sumir quando o celular limpar os arquivos temporários
+  async function selecionarImagem() {
+    const foto = await escolherImagemBase64();
+    if (foto) {
+      setImagem(foto);
+    }
+  }
+
+  // Sai de verdade da conta no Firebase antes de voltar para o login
+  async function sair() {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.log(error);
+    }
+    router.replace('/login');
+  }
+
   return (
 
     <SafeAreaView style={styles.container}>
@@ -98,7 +89,7 @@ export default function Perfil() {
 
         <Text style={styles.name}>{nome}</Text>
         <Text style={styles.email}>
-          stockmotopeca@gmail.com
+          {email || "stockmotopeca@gmail.com"}
         </Text>
 
       </View>
@@ -131,7 +122,7 @@ export default function Perfil() {
 
         <TouchableOpacity
           style={styles.logoutButton}
-          onPress={() => router.replace('/login')}
+          onPress={sair}
           >
           <Text style={styles.logoutText}>SAIR</Text>
         </TouchableOpacity>
@@ -140,7 +131,6 @@ export default function Perfil() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -179,9 +169,9 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-  width: "100%",
-  height: "100%",
-  borderRadius: 50,
+    width: "100%",
+    height: "100%",
+    borderRadius: 50,
   },
 
   avatarWrapper: {
