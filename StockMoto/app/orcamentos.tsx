@@ -7,6 +7,7 @@ import React, { useState, useCallback } from "react";
 import { useFocusEffect } from "expo-router/react-navigation";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { listarOrcamentosFirebase, excluirOrcamentoFirebase } from "../services/orcamentosFirebase";
+import { calcularValidade } from "../services/validadeOrcamento";
 
 // Altura da barra do Footer (65) + distância dela até a borda (bottom: 5)
 const ALTURA_FOOTER = 70;
@@ -73,8 +74,11 @@ export default function Orcamentos() {
   );
 
   function renderItem({ item }: any) {
+    const validade = calcularValidade(item);
+    const expirado = validade.status === "expirado";
+
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, expirado && styles.cardExpirado]}>
         <View style={styles.cardHeader}>
           <Ionicons
             name="document-text"
@@ -85,6 +89,14 @@ export default function Orcamentos() {
           <Text style={styles.cliente}>
             {item.cliente}
           </Text>
+
+          {(validade.status === "expirado" || validade.status === "vencendo") && (
+            <View style={[styles.statusBadge, { backgroundColor: validade.cor }]}>
+              <Text style={styles.statusBadgeText}>
+                {expirado ? "EXPIRADO" : "VENCENDO"}
+              </Text>
+            </View>
+          )}
         </View>
 
         <Text style={styles.moto}>
@@ -95,11 +107,38 @@ export default function Orcamentos() {
           📞 {item.telefone || "Não informado"}
         </Text>
 
-        <Text style={styles.info}>
-          📅 Validade: {item.validade || "0"} dias
+        <Text style={[styles.info, { color: validade.cor }]}>
+          📅 {validade.texto}
         </Text>
 
+        {item.observacoes ? (
+          <View style={styles.obsBox}>
+            <Text style={styles.obsTitulo}>📝 Observações</Text>
+            <Text style={styles.obsTexto} numberOfLines={3}>
+              {item.observacoes}
+            </Text>
+          </View>
+        ) : null}
+
         <View style={styles.divider} />
+
+        {Number(item.desconto || 0) > 0 && (
+          <>
+            <View style={styles.valorLinha}>
+              <Text style={styles.valorLabel}>Subtotal</Text>
+              <Text style={styles.valorTexto}>
+                R$ {Number(item.subtotal || 0).toFixed(2)}
+              </Text>
+            </View>
+
+            <View style={styles.valorLinha}>
+              <Text style={styles.valorLabel}>Desconto</Text>
+              <Text style={styles.descontoTexto}>
+                - R$ {Number(item.desconto || 0).toFixed(2)}
+              </Text>
+            </View>
+          </>
+        )}
 
         <Text style={styles.total}>
           R$ {Number(item.total || 0).toFixed(2)}
@@ -282,6 +321,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 
+  cardExpirado: {
+    opacity: 0.7,
+    borderWidth: 1,
+    borderColor: "#FF3B3B",
+  },
+
+  statusBadge: {
+    marginLeft: "auto",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+
+  statusBadgeText: {
+    color: "#000",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+
   cliente: {
     color: "#FFF",
     fontSize: 16,
@@ -297,6 +355,47 @@ const styles = StyleSheet.create({
   info: {
     color: "#AAA",
     marginBottom: 4,
+  },
+
+  obsBox: {
+    backgroundColor: "#262626",
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 6,
+  },
+
+  obsTitulo: {
+    color: "#F57C00",
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+
+  obsTexto: {
+    color: "#CCC",
+    fontSize: 13,
+  },
+
+  valorLinha: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 4,
+  },
+
+  valorLabel: {
+    color: "#AAA",
+    fontSize: 13,
+  },
+
+  valorTexto: {
+    color: "#DDD",
+    fontSize: 13,
+  },
+
+  descontoTexto: {
+    color: "#FF5A5A",
+    fontSize: 13,
+    fontWeight: "bold",
   },
 
   divider: {

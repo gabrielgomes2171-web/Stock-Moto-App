@@ -152,7 +152,7 @@ export default function Configuracoes() {
             </Text>
 
             <Text style={styles.itemDesc}>
-              Alertar sobre orçamentos próximos do vencimento
+              Mostrar em Alertas os orçamentos que vencem em até 3 dias ou já venceram
             </Text>
           </View>
 

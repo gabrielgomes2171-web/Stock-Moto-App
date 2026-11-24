@@ -7,6 +7,8 @@ import {
   updateDoc,
   doc,
   increment,
+  getDoc,
+  deleteDoc,
 } from 'firebase/firestore';
 
 import {
@@ -185,4 +187,35 @@ export async function listarTodosProdutosFirebase() {
     id: documento.id,
     ...documento.data(),
   }));
+}
+
+// Busca uma peça pelo id (usado na tela Editar Peça)
+export async function buscarProdutoPorIdFirebase(produtoId) {
+  const ref = doc(dbFirebase, 'produtos', produtoId);
+  const snapshot = await getDoc(ref);
+
+  if (!snapshot.exists()) {
+    return null;
+  }
+
+  return {
+    id: snapshot.id,
+    ...snapshot.data(),
+  };
+}
+
+// Salva as alterações de uma peça
+export async function atualizarProdutoFirebase(produtoId, dados) {
+  const ref = doc(dbFirebase, 'produtos', produtoId);
+
+  await updateDoc(ref, {
+    ...dados,
+    atualizado_em: new Date(),
+  });
+}
+
+// Exclui uma peça
+export async function excluirProdutoFirebase(produtoId) {
+  const ref = doc(dbFirebase, 'produtos', produtoId);
+  await deleteDoc(ref);
 }

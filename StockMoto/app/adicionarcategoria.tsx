@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 
 import React, { useCallback, useState } from 'react';
-import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter, useFocusEffect } from 'expo-router';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { escolherImagemBase64 } from '../services/imagemBase64';
 
 import {
   cadastrarCategoriaFirebase,
@@ -77,25 +77,12 @@ export default function AdicionarCategoria() {
     ...marcas.map((m) => m.nome).filter((n) => !MARCAS_FIXAS.includes(n)),
   ];
 
+  // Escolhe a foto, diminui o tamanho e guarda como texto (base64),
+  // para ela aparecer sempre, em qualquer celular
   async function escolherImagem() {
-    const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permissao.granted) {
-      Alert.alert(
-        'Permissão necessária',
-        'Permita acesso à galeria para escolher uma imagem'
-      );
-      return;
-    }
-
-    const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!resultado.canceled) {
-      setImagem(resultado.assets[0].uri);
+    const foto = await escolherImagemBase64();
+    if (foto) {
+      setImagem(foto);
     }
   }
 

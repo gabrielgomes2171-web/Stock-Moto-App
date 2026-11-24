@@ -9,11 +9,12 @@ import {
   StyleSheet,
   Image,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -21,6 +22,57 @@ import Footer from "@/components/Footer";
 import {
   listarAlertasFirebase,
 } from "../firebase/produtosFirebase";
+import { listarOrcamentosFirebase } from "../services/orcamentosFirebase";
+import { calcularValidade } from "../services/validadeOrcamento";
+
+// Card de um orçamento que está vencendo ou já venceu
+function ItemOrcamento({ item }: any) {
+  const router = useRouter();
+  const expirado = item.tipo === "orcamento_expirado";
+  const cor = expirado ? "#FF3B3B" : "#FFC107";
+
+  return (
+    <TouchableOpacity
+      style={styles.item}
+      onPress={() =>
+        router.push({
+          pathname: "/editarorcamento",
+          params: { id: item.id },
+        })
+      }
+    >
+      <View style={styles.left}>
+        <View style={[styles.img, styles.iconBox]}>
+          <Text style={{ fontSize: 22 }}>{expirado ? "⌛" : "📄"}</Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.tipoAlerta, { color: cor }]}>
+            {expirado ? "⌛ ORÇAMENTO EXPIRADO" : "📄 ORÇAMENTO VENCENDO"}
+          </Text>
+
+          <Text style={styles.nome}>
+            {item.cliente || "Cliente não informado"}
+          </Text>
+
+          <Text style={styles.moto}>
+            🏍️ {item.moto || "-"}
+          </Text>
+
+          <Text style={[styles.moto, { color: cor }]}>
+            {item.validadeInfo.texto}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.right}>
+        <Text style={[styles.qtd, { color: "#4CAF50" }]}>
+          R$ {Number(item.total || 0).toFixed(2)}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 function ItemAlerta({ item }: any) {
   const esgotado = item.tipo === "zerado";
@@ -101,6 +153,9 @@ export default function Alertas() {
   const [alertas, setAlertas] =
     useState<any[]>([]);
 
+  const [alertasOrcamento, setAlertasOrcamento] =
+    useState<any[]>([]);
+
   useFocusEffect(
     useCallback(() => {
       carregarAlertas();
@@ -128,6 +183,42 @@ export default function Alertas() {
         );
 
       setAlertas(lista as any[]);
+
+      // "Orçamentos Expirando" ligado em Configurações?
+      if (configuracoes.orcamento) {
+        const orcamentos =
+          (await listarOrcamentosFirebase()) as any[];
+
+        const comProblema = orcamentos
+          .map((orcamento) => {
+            const validadeInfo =
+              calcularValidade(orcamento);
+
+            return {
+              ...orcamento,
+              validadeInfo,
+              tipo:
+                validadeInfo.status === "expirado"
+                  ? "orcamento_expirado"
+                  : "orcamento_vencendo",
+            };
+          })
+          .filter(
+            (orcamento) =>
+              orcamento.validadeInfo.status === "vencendo" ||
+              orcamento.validadeInfo.status === "expirado"
+          )
+          // os que vencem primeiro aparecem em cima
+          .sort(
+            (a, b) =>
+              a.validadeInfo.diasRestantes -
+              b.validadeInfo.diasRestantes
+          );
+
+        setAlertasOrcamento(comProblema);
+      } else {
+        setAlertasOrcamento([]);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -145,7 +236,7 @@ export default function Alertas() {
         item.tipo === "baixo"
     );
 
-  const listaFinal = [
+  const listaFinal: any[] = [
     {
       tipo: "titulo",
       titulo: `🚨 Esgotados (${esgotados.length})`,
@@ -163,6 +254,43 @@ export default function Alertas() {
     ...estoqueBaixo,
   ];
 
+  const orcamentosVencendo =
+    alertasOrcamento.filter(
+      (item: any) =>
+        item.tipo === "orcamento_vencendo"
+    );
+
+  const orcamentosExpirados =
+    alertasOrcamento.filter(
+      (item: any) =>
+        item.tipo === "orcamento_expirado"
+    );
+
+  if (orcamentosVencendo.length > 0) {
+    listaFinal.push(
+      {
+        tipo: "titulo",
+        titulo: `📄 Orçamentos Vencendo (${orcamentosVencendo.length})`,
+        cor: "#FFC107",
+      },
+      ...orcamentosVencendo
+    );
+  }
+
+  if (orcamentosExpirados.length > 0) {
+    listaFinal.push(
+      {
+        tipo: "titulo",
+        titulo: `⌛ Orçamentos Expirados (${orcamentosExpirados.length})`,
+        cor: "#FF3B3B",
+      },
+      ...orcamentosExpirados
+    );
+  }
+
+  const totalAlertas =
+    alertas.length + alertasOrcamento.length;
+
   return (
     <View style={styles.container}>
       <Header
@@ -176,10 +304,10 @@ export default function Alertas() {
         </Text>
 
         <Text style={styles.subtitulo}>
-          Produtos que precisam de atenção
+          Produtos e orçamentos que precisam de atenção
         </Text>
 
-        {alertas.length === 0 ? (
+        {totalAlertas === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji}>
               ✅
@@ -193,7 +321,8 @@ export default function Alertas() {
               style={styles.vazioDescricao}
             >
               Todos os produtos estão
-              dentro do estoque ideal.
+              dentro do estoque ideal
+              e nenhum orçamento está vencendo.
             </Text>
           </View>
         ) : (
@@ -207,7 +336,7 @@ export default function Alertas() {
               index
             ) =>
               item.id
-                ? item.id.toString()
+                ? `${item.tipo}-${item.id}`
                 : `titulo-${index}`
             }
             renderItem={({
@@ -227,6 +356,15 @@ export default function Alertas() {
                   >
                     {item.titulo}
                   </Text>
+                );
+              }
+
+              if (
+                item.tipo === "orcamento_vencendo" ||
+                item.tipo === "orcamento_expirado"
+              ) {
+                return (
+                  <ItemOrcamento item={item} />
                 );
               }
 
@@ -297,6 +435,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#444",
     marginRight: 10,
+  },
+
+  iconBox: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#3A3A3A",
   },
 
   tipoAlerta: {

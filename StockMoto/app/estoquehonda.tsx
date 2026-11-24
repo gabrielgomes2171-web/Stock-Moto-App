@@ -3,6 +3,7 @@ import React, { useCallback, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useRouter, useFocusEffect } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import ModeloCard from "@/components/ModeloCard";
 import { listarModelosPorMarcaFirebase } from "../firebase/categoriasFirebase";
 
@@ -26,6 +27,13 @@ export default function EstoqueHonda() {
             <Header title="Estoque Honda" showSettings />
 
             <ScrollView contentContainerStyle={styles.content}>
+
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={() => router.replace("/estoque")}
+                >
+                  <Ionicons name="arrow-back" size={20} color="#FFF" />
+                </TouchableOpacity>
 
                 <View style={styles.brandBox}>
                     
@@ -124,6 +132,16 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
 
+  backButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#F4882F",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+
   brandBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -199,4 +217,3 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
-  

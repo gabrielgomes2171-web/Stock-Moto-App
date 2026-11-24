@@ -9,12 +9,12 @@ import {
   Alert,
 } from 'react-native';
 
-import React, { useCallback, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { escolherImagemBase64 } from '../services/imagemBase64';
 
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
@@ -25,7 +25,9 @@ import {
 
 import { listarCategoriasFirebase } from '../firebase/categoriasFirebase';
 
+// "UNIVERSAL" é para acessórios que servem em qualquer moto (capacete, baú...)
 const MODELOS_FIXOS = [
+  'UNIVERSAL',
   'CG 160 FAN',
   'CG 160 TITAN',
   'CG 160 START',
@@ -49,6 +51,17 @@ export default function Cadastrar() {
   const [imagem, setImagem] = useState('');
   const [modelosExtras, setModelosExtras] = useState<string[]>([]);
 
+  // Quando vem das telas Capacetes/Baú, a Categoria já chega preenchida
+  // e o modelo vira UNIVERSAL. Ex: /cadastrar?categoria=CAPACETES
+  const params = useLocalSearchParams<{ categoria?: string }>();
+
+  useEffect(() => {
+    if (params.categoria) {
+      setCategoria(String(params.categoria));
+      setModeloMoto('UNIVERSAL');
+    }
+  }, [params.categoria]);
+
   // Carrega os modelos adicionados em "Adicionar ao Estoque"
   useFocusEffect(
     useCallback(() => {
@@ -64,27 +77,12 @@ export default function Cadastrar() {
     }, [])
   );
 
+  // Escolhe a foto, diminui o tamanho e guarda como texto (base64),
+  // para ela aparecer sempre, em qualquer celular
   async function escolherImagem() {
-    const permissao =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permissao.granted) {
-      Alert.alert(
-        'Permissão necessária',
-        'Permita acesso à galeria para escolher uma imagem'
-      );
-      return;
-    }
-
-    const resultado =
-      await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 1,
-      });
-
-    if (!resultado.canceled) {
-      setImagem(resultado.assets[0].uri);
+    const foto = await escolherImagemBase64();
+    if (foto) {
+      setImagem(foto);
     }
   }
 
@@ -120,9 +118,10 @@ export default function Cadastrar() {
 
       setNome('');
       setCodigo('');
-      setCategoria('');
+      // Se veio de Capacetes/Baú, mantém a Categoria para cadastrar o próximo
+      setCategoria(params.categoria ? String(params.categoria) : '');
       setMarca('');
-      setModeloMoto('');
+      setModeloMoto(params.categoria ? 'UNIVERSAL' : '');
       setDescricao('');
       setLocalizacao('');
       setPrecoVenda('');

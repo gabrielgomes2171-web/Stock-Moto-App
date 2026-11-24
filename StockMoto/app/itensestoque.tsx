@@ -15,6 +15,7 @@ import { useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import InfoPeca from "@/components/InfoPeca";
 
 import {
   listarProdutosPorModeloFirebase,
@@ -196,21 +197,7 @@ export default function ItensEstoque() {
 
             return (
               <View style={styles.itemCard} key={item.id}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.itemName}>{item.nome}</Text>
-
-                  <Text style={styles.itemInfo}>Código: {item.codigo}</Text>
-
-                  <Text style={styles.itemInfo}>Marca: {item.marca}</Text>
-
-                  <Text style={styles.itemPrice}>
-                    R$ {Number(item.preco_venda || 0).toFixed(2)}
-                  </Text>
-
-                  {baixo && (
-                    <Text style={styles.alertText}>⚠ ESTOQUE BAIXO</Text>
-                  )}
-                </View>
+                <InfoPeca item={item} baixo={baixo} />
 
                 <View style={styles.rightContent}>
                   <Text

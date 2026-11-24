@@ -205,8 +205,17 @@ function converterProduto(produto: any, acessorios: any[]): Resultado {
   // 1) A categoria é um acessório criado pelo usuário? Abre o acessório.
   const acessorio = acessorios.find((a) => a.nome === categoria);
 
+  const ehCapacete = ["CAPACETE", "CAPACETES"].includes(categoria);
+  const ehBau = ["BAU", "BAÚ", "BAUS", "BAÚS", "BAULETO"].includes(categoria);
+  const ehAcessorio = ehCapacete || ehBau || !!acessorio;
+
   let rota: Href;
-  if (acessorio) {
+  if (ehCapacete) {
+    // Capacetes e Baú têm telas próprias
+    rota = "/capacetes";
+  } else if (ehBau) {
+    rota = "/bau";
+  } else if (acessorio) {
     rota = {
       pathname: "/itensestoque",
       params: { tipo: "acessorio", nome: acessorio.nome, imagem: acessorio.imagem || "" },
@@ -225,7 +234,7 @@ function converterProduto(produto: any, acessorios: any[]): Resultado {
   return {
     id: produto.id,
     titulo: produto.nome || "Sem nome",
-    subtitulo: `Cód: ${produto.codigo || "-"} • ${acessorio ? acessorio.nome : modelo || "Sem modelo"}`,
+    subtitulo: `Cód: ${produto.codigo || "-"} • ${ehAcessorio ? categoria : modelo || "Sem modelo"}`,
     extra: `${quantidade} un.`,
     extraAlerta: quantidade <= minimo,
     imagem: produto.imagem ? { uri: produto.imagem } : undefined,
