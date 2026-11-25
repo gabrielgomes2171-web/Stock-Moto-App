@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { UserProvider } from '../contexts/UserContext';
+import '../services/alertWeb';
 
 export default function Layout() {
   return (
